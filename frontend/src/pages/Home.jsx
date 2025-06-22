@@ -13,7 +13,7 @@ const Home = () => {
   //   }
   // }, []);
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="px-4 py-8 bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
       <header className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Welcome to HealthCare App</h1>
         <p className="text-xl text-gray-600">Your Health, Our Priority</p>
@@ -103,7 +103,7 @@ const Home = () => {
 };
 
 const FeatureCard = ({ icon, title, description }) => (
-  <div className="bg-white p-6 rounded-lg shadow-md">
+  <div className="bg-[#A7E6F5] p-6 rounded-lg shadow-md">
     <div className="text-center">
       {icon}
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
@@ -113,7 +113,7 @@ const FeatureCard = ({ icon, title, description }) => (
 );
 
 const ReasonCard = ({ title, description }) => (
-  <div className="bg-gray-100 p-6 rounded-lg">
+  <div className="bg-[#A7E6F5] p-6 rounded-lg">
     <h4 className="text-xl font-semibold mb-2">{title}</h4>
     <p className="text-gray-600">{description}</p>
   </div>

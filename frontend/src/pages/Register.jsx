@@ -1,358 +1,501 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import axios from "axios"; // Axios for backend connection
+import React from 'react';
 
-const schema = yup.object().shape({
-  fullName: yup.string().required("Full name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm password is required"),
+// Mock hook functions for demonstration
+const useForm = () => ({
+  register: (name) => ({ name }),
+  handleSubmit: (callback) => (e) => {
+    e.preventDefault();
+    callback({ fullName: 'John Doe', email: 'john@example.com', password: 'password123', confirmPassword: 'password123' });
+  },
+  formState: { errors: {} }
 });
 
-const Register = () => {
-  const navigate = useNavigate();
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
+export default function RegisterPage() {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
 
   const onSubmit = async (data) => {
-    setError(null);
     setIsLoading(true);
-    try {
-      // Backend request for user registration
-      await axios.post("http://localhost:5000/api/auth/register", {
-        name: data.fullName,
-        email: data.email,
-        password: data.password,
-      });
-
-      navigate("/"); // Redirect to login page on successful registration
-    } catch (error) {
-      console.error("Registration error:", error);
-      setError("An error occurred during registration. Please try again.");
-    } finally {
+    setError('');
+    
+    // Simulate API call
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      console.log('Registration data:', data);
+    }, 2000);
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-center">
-        <img
-          className=""
-          src="src/assets/images/login.png"
-          alt="Healthcare"
-          width="300"
-          height="300"
-        />
-      </div>
-      <div className="max-w-md mx-auto bg-gray-300 rounded-[40px] shadow-md overflow-hidden">
-        <div className="px-6 py-8">
-          <h2 className="text-2xl font-bold text-center text-gray-700 mb-8">
-            Create an Account
-          </h2>
-          {error && (
-            <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
-              <span className="block sm:inline">{error}</span>
-            </div>
-          )}
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="mb-4">
-              <label
-                htmlFor="fullName"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Full Name
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                {...register("fullName")}
-                className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+      <div className="min-h-screen w-full bg-gradient-to-br from-[#F0FDFF] via-[#E6FFFE] to-[#D1F5F7] py-6 px-4 flex items-center justify-center">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* Left Side - Image and Welcome Text */}
+            <div className="hidden lg:flex flex-col items-center justify-center space-y-6">
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-200 to-blue-200 rounded-full blur-2xl opacity-30"></div>
+              <img
+                className="relative z-10 drop-shadow-2xl"
+                src="src/assets/images/login.png"
+                alt="Healthcare"
+                width="400"
+                height="400"
               />
-              {errors.fullName && (
-                <p className="text-red-500 text-xs italic">
-                  {errors.fullName.message}
-                </p>
-              )}
             </div>
-            <div className="mb-4">
-              <label
-                htmlFor="email"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                {...register("email")}
-                className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
-              {errors.email && (
-                <p className="text-red-500 text-xs italic">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="password"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                {...register("password")}
-                className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
-              {errors.password && (
-                <p className="text-red-500 text-xs italic">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-            <div className="mb-6">
-              <label
-                htmlFor="confirmPassword"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                {...register("confirmPassword")}
-                className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-xs italic">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center justify-center">
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
-                disabled={isLoading}
-              >
-                {isLoading ? "Signing Up..." : "Register"}
-              </button>
-            </div>
-            <div className="px-6 py-4">
-              <p className="text-center text-gray-600 text-sm">
-                Already have an account?{" "}
-                <Link
-                  to="/"
-                  className="font-bold text-blue-500 hover:text-blue-800"
-                >
-                  Login
-                </Link>
+            
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-gray-800">
+                Welcome Back!
+              </h1>
+              <p className="text-gray-600 text-lg max-w-md">
+                Access your personalized healthcare dashboard and continue your wellness journey
               </p>
+              
+              <div className="flex items-center justify-center space-x-6 pt-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-600">Secure Login</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-600">24/7 Support</span>
+                </div>
+              </div>
             </div>
-          </form>
+          </div>
+  
+            {/* Right Side - Register Form */}
+            <div className="w-full max-w-lg mx-auto">
+              {/* Mobile Header */}
+              <div className="lg:hidden text-center mb-6">
+                <div className="mx-auto mb-4 w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full flex items-center justify-center shadow-lg">
+                  <div className="text-3xl">👨‍⚕️</div>
+                </div>
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                  Join Our Medical Team!
+                </h1>
+                <p className="text-gray-600 text-sm">
+                  Register as a healthcare professional
+                </p>
+              </div>
+  
+              {/* Register Card */}
+              <div className="bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+                <div className="px-6 py-6">
+                  {/* Header */}
+                  <div className="text-center mb-6">
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">
+                      Doctor Registration
+                    </h2>
+                    <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full mx-auto"></div>
+                  </div>
+  
+                  {/* Error Message */}
+                  {error && (
+                    <div className="bg-red-50 border-l-4 border-red-400 p-3 mb-4 rounded-r-lg">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg
+                            className="h-4 w-4 text-red-400"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm text-red-700">{error}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+  
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {/* Two-column layout for form fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Full Name Field */}
+                      <div className="space-y-1">
+                        <label
+                          htmlFor="fullName"
+                          className="block text-sm font-semibold text-gray-700"
+                        >
+                          Full Name
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg
+                              className="h-4 w-4 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                              />
+                            </svg>
+                          </div>
+                          <input
+                            type="text"
+                            id="fullName"
+                            {...register("fullName")}
+                            className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                            placeholder="Enter your full name"
+                          />
+                        </div>
+                        {errors.fullName && (
+                          <p className="text-red-500 text-xs flex items-center">
+                            <svg
+                              className="w-3 h-3 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {errors.fullName.message}
+                          </p>
+                        )}
+                      </div>
+  
+                      {/* Email Field */}
+                      <div className="space-y-1">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-semibold text-gray-700"
+                        >
+                          Email Address
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg
+                              className="h-4 w-4 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                              />
+                            </svg>
+                          </div>
+                          <input
+                            type="email"
+                            id="email"
+                            {...register("email")}
+                            className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                            placeholder="Enter your email"
+                          />
+                        </div>
+                        {errors.email && (
+                          <p className="text-red-500 text-xs flex items-center">
+                            <svg
+                              className="w-3 h-3 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {errors.email.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+  
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Password Field */}
+                      <div className="space-y-1">
+                        <label
+                          htmlFor="password"
+                          className="block text-sm font-semibold text-gray-700"
+                        >
+                          Password
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg
+                              className="h-4 w-4 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                              />
+                            </svg>
+                          </div>
+                          <input
+                            type="password"
+                            id="password"
+                            {...register("password")}
+                            className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                            placeholder="Create a password"
+                          />
+                        </div>
+                        {errors.password && (
+                          <p className="text-red-500 text-xs flex items-center">
+                            <svg
+                              className="w-3 h-3 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {errors.password.message}
+                          </p>
+                        )}
+                      </div>
+  
+                      {/* Confirm Password Field */}
+                      <div className="space-y-1">
+                        <label
+                          htmlFor="confirmPassword"
+                          className="block text-sm font-semibold text-gray-700"
+                        >
+                          Confirm Password
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg
+                              className="h-4 w-4 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                          </div>
+                          <input
+                            type="password"
+                            id="confirmPassword"
+                            {...register("confirmPassword")}
+                            className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                            placeholder="Confirm your password"
+                          />
+                        </div>
+                        {errors.confirmPassword && (
+                          <p className="text-red-500 text-xs flex items-center">
+                            <svg
+                              className="w-3 h-3 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {errors.confirmPassword.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+  
+                    {/* Specialization Field - Full Width */}
+                    <div className="space-y-1">
+                      <label
+                        htmlFor="specialization"
+                        className="block text-sm font-semibold text-gray-700"
+                      >
+                        Medical Specialization
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg
+                            className="h-4 w-4 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                            />
+                          </svg>
+                        </div>
+                        <select
+                          id="specialization"
+                          {...register("specialization")}
+                          className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                        >
+                          <option value="">Select your specialization</option>
+                          <option value="Cardiologist">Cardiologist</option>
+                          <option value="Dermatologist">Dermatologist</option>
+                          <option value="Pediatrician">Pediatrician</option>
+                          <option value="Oncologist">Oncologist</option>
+                          <option value="Neurologist">Neurologist</option>
+                          <option value="Orthopedic Surgeon">
+                            Orthopedic Surgeon
+                          </option>
+                          <option value="Psychiatrist">Psychiatrist</option>
+                          <option value="Endocrinologist">Endocrinologist</option>
+                        </select>
+                      </div>
+                      {errors.specialization && (
+                        <p className="text-red-500 text-xs flex items-center">
+                          <svg
+                            className="w-3 h-3 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {errors.specialization.message}
+                        </p>
+                      )}
+                    </div>
+  
+                    {/* Register Button */}
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center justify-center">
+                          <svg
+                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Registering...
+                        </div>
+                      ) : (
+                        "Register as Doctor"
+                      )}
+                    </button>
+                  </form>
+                </div>
+  
+                {/* Footer Links */}
+                <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100">
+                  <div className="space-y-3 text-center">
+                    <p className="text-sm text-gray-600">
+                      Already have an account?{" "}
+                      <Link
+                        to="/DocLogin"
+                        className="font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                      >
+                        Sign In
+                      </Link>
+                    </p>
+  
+                    <div className="flex items-center">
+                      <div className="flex-1 border-t border-gray-200"></div>
+                      <div className="px-4 text-sm text-gray-500">or</div>
+                      <div className="flex-1 border-t border-gray-200"></div>
+                    </div>
+  
+                    <p className="text-sm text-gray-600">
+                      Not a doctor?{" "}
+                      <Link
+                        to="/"
+                        className="font-semibold text-cyan-600 hover:text-cyan-800 transition-colors duration-200 inline-flex items-center"
+                      >
+                        Patient Registration
+                        <svg
+                          className="w-4 h-4 ml-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </div>
+  
+              {/* Security Badge */}
+              <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-600">
+                <div className="flex items-center space-x-1">
+                  <svg
+                    className="w-4 h-4 text-green-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Medical Verified</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <svg
+                    className="w-4 h-4 text-blue-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Professional Network</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-export default Register;
-
-// import React, { useState } from "react";
-// import { Link, useNavigate } from "react-router-dom";
-// import { useForm } from "react-hook-form";
-// import { yupResolver } from "@hookform/resolvers/yup";
-// import * as yup from "yup";
-// import { useAuth } from "../contexts/AuthContext";
-
-// const schema = yup.object().shape({
-//   fullName: yup.string().required("Full name is required"),
-//   email: yup.string().email("Invalid email").required("Email is required"),
-//   password: yup
-//     .string()
-//     .min(6, "Password must be at least 6 characters")
-//     .required("Password is required"),
-//   confirmPassword: yup
-//     .string()
-//     .oneOf([yup.ref("password")], "Passwords must match")
-//     .required("Confirm password is required"),
-// });
-
-// const Register = () => {
-//   const { register: registerUser } = useAuth();
-//   const navigate = useNavigate();
-//   const [error, setError] = useState(null);
-//   const [isLoading, setIsLoading] = useState(false);
-//   const {
-//     register,
-//     handleSubmit,
-//     formState: { errors },
-//   } = useForm({
-//     resolver: yupResolver(schema),
-//   });
-
-//   const onSubmit = async (data) => {
-//     setError(null);
-//     setIsLoading(true);
-//     try {
-//       await registerUser(data.email, data.password, data.fullName);
-//       navigate("/");
-//     } catch (error) {
-//       console.error("Registration error:", error);
-//       setError("An error occurred during registration. Please try again.");
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="container mx-auto px-4 py-8">
-//       <div className="flex items-center justify-center">
-//         <img
-//           className=""
-//           src="src/assets/images/login.png"
-//           alt="Healthcare"
-//           width="300"
-//           height="300"
-//         />
-//       </div>
-//       <div className="max-w-md mx-auto bg-gray-300 rounded-[40px] shadow-md overflow-hidden">
-//         <div className="px-6 py-8">
-//           <h2 className="text-2xl font-bold text-center text-gray-700 mb-8">
-//             Create an Account
-//           </h2>
-//           {error && (
-//             <div
-//               className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-//               role="alert"
-//             >
-//               <span className="block sm:inline">{error}</span>
-//             </div>
-//           )}
-//           <form onSubmit={handleSubmit(onSubmit)}>
-//             <div className="mb-4">
-//               <label
-//                 htmlFor="fullName"
-//                 className="block text-gray-700 text-sm font-bold mb-2"
-//               >
-//                 Full Name
-//               </label>
-//               <input
-//                 type="text"
-//                 id="fullName"
-//                 {...register("fullName")}
-//                 className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-//               />
-//               {errors.fullName && (
-//                 <p className="text-red-500 text-xs italic">
-//                   {errors.fullName.message}
-//                 </p>
-//               )}
-//             </div>
-//             <div className="mb-4">
-//               <label
-//                 htmlFor="email"
-//                 className="block text-gray-700 text-sm font-bold mb-2"
-//               >
-//                 Email Address
-//               </label>
-//               <input
-//                 type="email"
-//                 id="email"
-//                 {...register("email")}
-//                 className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-//               />
-//               {errors.email && (
-//                 <p className="text-red-500 text-xs italic">
-//                   {errors.email.message}
-//                 </p>
-//               )}
-//             </div>
-//             <div className="mb-4">
-//               <label
-//                 htmlFor="password"
-//                 className="block text-gray-700 text-sm font-bold mb-2"
-//               >
-//                 Password
-//               </label>
-//               <input
-//                 type="password"
-//                 id="password"
-//                 {...register("password")}
-//                 className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-//               />
-//               {errors.password && (
-//                 <p className="text-red-500 text-xs italic">
-//                   {errors.password.message}
-//                 </p>
-//               )}
-//             </div>
-//             <div className="mb-6">
-//               <label
-//                 htmlFor="confirmPassword"
-//                 className="block text-gray-700 text-sm font-bold mb-2"
-//               >
-//                 Confirm Password
-//               </label>
-//               <input
-//                 type="password"
-//                 id="confirmPassword"
-//                 {...register("confirmPassword")}
-//                 className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-//               />
-//               {errors.confirmPassword && (
-//                 <p className="text-red-500 text-xs italic">
-//                   {errors.confirmPassword.message}
-//                 </p>
-//               )}
-//             </div>
-//             <div className="flex items-center justify-center">
-//               <button
-//                 type="submit"
-//                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
-//                 disabled={isLoading}
-//               >
-//                 {isLoading ? "Signing Up..." : "Register"}
-//               </button>
-//             </div>
-//             <div className="px-6 py-4">
-//               <p className="text-center text-gray-600 text-sm">
-//                 Already have an account?{" "}
-//                 <Link
-//                   to="/login"
-//                   className="font-bold text-blue-500 hover:text-blue-800"
-//                 >
-//                   Login
-//                 </Link>
-//               </p>
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Register;
+    );
+}

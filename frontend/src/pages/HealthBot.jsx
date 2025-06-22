@@ -186,7 +186,7 @@ const HealthBot = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row w-screen">
+    <div className="flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
       {/* Profile Box */}
       <div className="w-4/5 lg:w-1/5 h-[500px] border-2 border-black border-solid mt-10 mx-auto lg:ml-20 rounded-[30px] bg-[#64F9FA]">
         <div className="mt-12 w-full flex items-center justify-center">
