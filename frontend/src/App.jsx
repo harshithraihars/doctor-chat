@@ -20,8 +20,8 @@ function App() {
           <Navbar />
           <main className="flex-grow">
             <Routes>
-              <Route path="/home" element={<Home />} />
-              <Route path="/" element={<Login/>} />
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login/>} />
               <Route path="/register" element={<Register />} />
               <Route path="/selectspecialist" element={<SelectSpecialist/>}/>
               <Route path="/DocLogin" element={<DoctorLogin/>} />

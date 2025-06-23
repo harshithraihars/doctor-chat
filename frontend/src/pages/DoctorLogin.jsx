@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
+import LeftSideBar from "../components/LeftSideBar";
 
 const schema = yup.object().shape({
   doctorId: yup.string().required("Doctor ID is required"),
@@ -62,16 +63,7 @@ const DoctorLogin = () => {
           
           {/* Left Side - Image and Welcome Text */}
           <div className="hidden lg:flex flex-col items-center justify-center space-y-6">
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-200 to-indigo-200 rounded-full blur-2xl opacity-30"></div>
-              <img
-                className="relative z-10 drop-shadow-2xl"
-                src="src/assets/images/login.png"
-                alt="Healthcare Professional"
-                width="400"
-                height="400"
-              />
-            </div>
+            <LeftSideBar/>
             
             <div className="text-center space-y-4">
               <h1 className="text-4xl font-bold text-gray-800">
@@ -259,22 +251,6 @@ const DoctorLogin = () => {
                     </Link>
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Security Badge */}
-            <div className="mt-6 flex items-center justify-center space-x-4 text-sm text-gray-600">
-              <div className="flex items-center space-x-1">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                </svg>
-                <span>SSL Secured</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>HIPAA Compliant</span>
               </div>
             </div>
           </div>
