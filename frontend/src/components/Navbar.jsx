@@ -20,15 +20,16 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout, doctor, setDoctor } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const Role=JSON.parse(localStorage.getItem("auth"))?.Role
+  // console.log(localStorage.getItem());
+  
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
   const handleDoctorLogout = () => {
-    setDoctor(null);
-    localStorage.removeItem("doctor");
+    localStorage.removeItem("auth");
     localStorage.removeItem("token");
     navigate("/DocLogin");
   };
@@ -65,7 +66,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {user ? (
+            {Role=="Client" ? (
               // Patient Navigation
               <>
                 <Link
@@ -113,7 +114,7 @@ const Navbar = () => {
                   </button>
                 </div>
               </>
-            ) : doctor ? (
+            ) : Role=="Doctor" ? (
               // Doctor Navigation
               <>
                 <div className="flex items-center space-x-3 px-4 py-2 bg-gray-800/10 rounded-lg">

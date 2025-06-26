@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
-import LeftSideBar from '../components/LeftSideBar';
-
-// Mock hook functions for demonstration
-const useForm = () => ({
-  register: (name) => ({ name }),
-  handleSubmit: (callback) => (e) => {
-    e.preventDefault();
-    callback({ fullName: 'John Doe', email: 'john@example.com', password: 'password123', confirmPassword: 'password123' });
-  },
-  formState: { errors: {} }
-});
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import LeftSideBar from "../components/LeftSideBar";
+import axios from "axios";
 
 // Mock Link component for demonstration
 const Link = ({ to, children, className }) => (
@@ -19,37 +12,64 @@ const Link = ({ to, children, className }) => (
 );
 
 export default function RegisterPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm({
+    mode: "onChange",
+  });
+
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
+  const password = watch("password");
 
   const onSubmit = async (data) => {
+    setError("");
     setIsLoading(true);
-    setError('');
-    
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        {
+          email: data.email,
+          password: data.password,
+          name: data.fullName,
+        }
+      );
+      if (response.status === 201) {
+        navigate("/login");
+      } else {
+        setError(response.data.message || "Registration failed");
+      }
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          "Registration failed. Please try again."
+      );
+    } finally {
       setIsLoading(false);
-      console.log('Registration data:', data);
-    }, 2000);
+    }
   };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#F0FDFF] via-[#E6FFFE] to-[#D1F5F7] py-6 px-4 flex items-center justify-center">
       <div className="w-full max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-8 items-center">
-          {/* Left Side - Image and Welcome Text */}
           <div className="hidden lg:flex flex-col items-center justify-center space-y-6">
-            <LeftSideBar/>
-            
+            <LeftSideBar />
+
             <div className="text-center space-y-4">
               <h1 className="text-4xl font-bold text-gray-800">
                 Welcome Back!
               </h1>
               <p className="text-gray-600 text-lg max-w-md">
-                Access your personalized healthcare dashboard and continue your wellness journey
+                Access your personalized healthcare dashboard and continue your
+                wellness journey
               </p>
-              
+
               <div className="flex items-center justify-center space-x-6 pt-4">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -65,19 +85,21 @@ export default function RegisterPage() {
 
           {/* Right Side - Register Form */}
           <div className="w-full max-w-lg mx-auto">
-            {/* Mobile Header */}
-            <div className="lg:hidden text-center mb-6">
-              <div className="mx-auto mb-4 w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full flex items-center justify-center shadow-lg">
-                <div className="text-3xl">🏥</div>
-              </div>
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                Join Our Healthcare Community!
+            <div className="lg:hidden text-center mb-8">
+              <img
+                className="mx-auto mb-4 drop-shadow-lg"
+                src="src/assets/images/login.png"
+                alt="Healthcare Professional"
+                width="200"
+                height="200"
+              />
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                Welcome Doctor!
               </h1>
-              <p className="text-gray-600 text-sm">
-                Register as a patient for better healthcare
+              <p className="text-gray-600">
+                Sign in to your professional dashboard
               </p>
             </div>
-
             {/* Register Card */}
             <div className="bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
               <div className="px-6 py-6">
@@ -93,19 +115,6 @@ export default function RegisterPage() {
                 {error && (
                   <div className="bg-red-50 border-l-4 border-red-400 p-3 mb-4 rounded-r-lg">
                     <div className="flex">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-4 w-4 text-red-400"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
                       <div className="ml-3">
                         <p className="text-sm text-red-700">{error}</p>
                       </div>
@@ -125,42 +134,22 @@ export default function RegisterPage() {
                         Full Name
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg
-                            className="h-4 w-4 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                            />
-                          </svg>
-                        </div>
                         <input
                           type="text"
                           id="fullName"
-                          {...register("fullName")}
-                          className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                          {...register("fullName", {
+                            required: "Full name is required",
+                            minLength: {
+                              value: 2,
+                              message: "Name must be at least 2 characters",
+                            },
+                          })}
+                          className="block w-full px-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
                           placeholder="Enter your full name"
                         />
                       </div>
                       {errors.fullName && (
-                        <p className="text-red-500 text-xs flex items-center">
-                          <svg
-                            className="w-3 h-3 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                        <p className="text-red-500 text-xs">
                           {errors.fullName.message}
                         </p>
                       )}
@@ -175,42 +164,22 @@ export default function RegisterPage() {
                         Email Address
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg
-                            className="h-4 w-4 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                            />
-                          </svg>
-                        </div>
                         <input
                           type="email"
                           id="email"
-                          {...register("email")}
-                          className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                          {...register("email", {
+                            required: "Email is required",
+                            pattern: {
+                              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                              message: "Invalid email address",
+                            },
+                          })}
+                          className="block w-full px-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
                           placeholder="Enter your email"
                         />
                       </div>
                       {errors.email && (
-                        <p className="text-red-500 text-xs flex items-center">
-                          <svg
-                            className="w-3 h-3 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                        <p className="text-red-500 text-xs">
                           {errors.email.message}
                         </p>
                       )}
@@ -227,42 +196,22 @@ export default function RegisterPage() {
                         Password
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg
-                            className="h-4 w-4 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                            />
-                          </svg>
-                        </div>
                         <input
                           type="password"
                           id="password"
-                          {...register("password")}
-                          className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                          {...register("password", {
+                            required: "Password is required",
+                            minLength: {
+                              value: 6,
+                              message: "Password must be at least 6 characters",
+                            },
+                          })}
+                          className="block w-full px-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
                           placeholder="Create a password"
                         />
                       </div>
                       {errors.password && (
-                        <p className="text-red-500 text-xs flex items-center">
-                          <svg
-                            className="w-3 h-3 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                        <p className="text-red-500 text-xs">
                           {errors.password.message}
                         </p>
                       )}
@@ -277,42 +226,20 @@ export default function RegisterPage() {
                         Confirm Password
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg
-                            className="h-4 w-4 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                        </div>
                         <input
                           type="password"
                           id="confirmPassword"
-                          {...register("confirmPassword")}
-                          className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
+                          {...register("confirmPassword", {
+                            required: "Please confirm your password",
+                            validate: (value) =>
+                              value === password || "Passwords do not match",
+                          })}
+                          className="block w-full px-3 py-2.5 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm"
                           placeholder="Confirm your password"
                         />
                       </div>
                       {errors.confirmPassword && (
-                        <p className="text-red-500 text-xs flex items-center">
-                          <svg
-                            className="w-3 h-3 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                        <p className="text-red-500 text-xs">
                           {errors.confirmPassword.message}
                         </p>
                       )}

@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { MessageCircle, Activity, Users, DollarSign } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { socket } from "../Socket/Socket";
+import HealthBot from "./HealthBot";
 
 const Home = () => {
-  const {user,setUser,setSocket,socket,senderId,setSenderId}=useAuth()
-  // useEffect(() => {
-  //   console.log(user,socket)
-  //   if (user && socket) { 
-      
-  //   }
-  // }, []);
+  const navigate = useNavigate();
+  const { user, setUser, setSocket, socket, senderId, setSenderId } = useAuth();
+  useEffect(() => {
+    setUser(JSON.stringify(localStorage.getItem("auth")));
+    if (user.Role == "Doctor") navigate("/health-bot");
+  }, []);
+
   return (
     <div className="px-4 py-8 bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
       <header className="text-center mb-12">

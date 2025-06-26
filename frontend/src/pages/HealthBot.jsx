@@ -1,190 +1,234 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Send } from "lucide-react";
 import sendSound from "../assets/images/send.mp3";
-import messsageSound from "../assets/images/message.mp3";
+import messageSound from "../assets/images/message.mp3";
 import docImg from "../assets/images/doc.png";
 import userImg from "../assets/images/user.png";
 import { FaArrowLeft } from "react-icons/fa6";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoSearch } from "react-icons/io5";
 import { useAuth } from "../contexts/AuthContext";
-import { docName, docRole, senderId } from "../contexts/Socket";
 import { ClipLoader } from "react-spinners";
+import { socket } from "../Socket/Socket";
+
 const HealthBot = () => {
-  const send = new Audio(sendSound);
-  const messagesound = new Audio(messsageSound);
-  const { specialist, socket, user, doctor } = useAuth();
-  const [doctorName, setDocname] = useState(null);
-  const [chat, setChat] = useState({});
-  const [currentClient, setcurrentClient] = useState(null);
-  // const [doctorSenderId, setDoctorSenderId] = useState(null);
-  // const [clientId, setClientId] = useState(null);
-  // const isSendingRef = useRef(false);
-  const [clientName, setClientName] = useState(null);
-  const [input, setInput] = useState("");
-  // const [isLoading, setIsLoading] = useState(false);
+  // Audio instances
+  const sendAudio = useRef(new Audio(sendSound));
+  const messageAudio = useRef(new Audio(messageSound));
+  
+  // Auth context
+  const { user, setUser } = useAuth();
+  
+  // State management
+  const [connectionDetails, setConnectionDetails] = useState({
+    receiverName: null,
+    receiverSocketId: null,
+    role: null,
+  });
+  
+  const [chatData, setChatData] = useState({}); // Store all chat conversations
+  const [selectedClientId, setSelectedClientId] = useState(null); // Currently selected client for doctor
+  const [clientList, setClientList] = useState([]); // List of clients for doctor sidebar
+  const [unreadCounts, setUnreadCounts] = useState({}); // Unread message counts
+  const [messageInput, setMessageInput] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Refs
   const messagesEndRef = useRef(null);
-  // const clientIdRef = useRef(null);
-  const [selectedClient, setSelectedClient] = useState(null);
-  // const doctorSenderIdRef = useRef(null);
-  const [doctorchat, setDoctorchat] = useState([]);
-  const [unreadMessages, setUnreadMessages] = useState({});
-  let sender, reciever;
-
-  useEffect(() => {
-    setDocname(docName);
-  }, [docName]);
-
-  useEffect(() => {
-    if (doctor) {
-      localStorage.setItem("docSend", senderId);
+  
+  // Helper functions
+  const playSound = useCallback((audioRef) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(console.error);
     }
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      socket.on("user-connected", ({ id }) => {
-        console.log(id);
-        setSenderId(id);
-      });
-      socket.emit("specializiation", { specializiation: specialist });
-    }
-  }, [user, socket, specialist]);
-
-  useEffect(() => {
-    sender = localStorage.getItem("sender");
-    setcurrentClient(sender);
-    reciever = localStorage.getItem("reciever");
-  }, [sender, reciever]);
-
-  const scrollToBottom = () => {
+  
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  }, []);
+  
+  // Initialize connection details from localStorage
   useEffect(() => {
-    if (socket) {
-      const handleReceive = ({ message, sendId, recieverName, recieverId }) => {
-        if (doctor) {
-          if (!selectedClient) {
-            setSelectedClient(sendId);
-          }
-          setDoctorchat((prevchat) => {
-            const isExist = prevchat.find(
-              (client) => client.socketId === sendId
-            );
-            if (!isExist) {
-              return [
-                ...prevchat,
-                {
-                  socketId: sendId,
-                  clientName: recieverName,
-                  lastMessage: "i want a favour",
-                },
-              ];
-            }
-            return prevchat;
-          });
-
-          if (selectedClient !== sendId) {
-            setDoctorchat((prevchat) => {
-              return prevchat.map((chat) => {
-                if (chat.socketId === sendId) {
-                  return { ...chat, lastMessage: message };
-                }
-                return chat;
-              });
-              
-            });
-            setUnreadMessages((prevCounts) => ({
-              ...prevCounts,
-              [sendId]: (prevCounts[sendId] || 0) + 1,
-            }));
-          }
-        }
-        messagesound.currentTime = 0;
-        messagesound.play();
-        if (user) {
-          // setDoctorSenderId(sendId);
-          // doctorSenderIdRef.current = sendId;
+    const savedUser = JSON.parse(localStorage.getItem("auth"));
+    const assignedDoctor = JSON.parse(localStorage.getItem("assignedDoctor"));
+    
+    if (savedUser) {
+      setUser(savedUser);
+      
+      if (assignedDoctor && savedUser.Role === "Client") {
+        setConnectionDetails({
+          receiverSocketId: assignedDoctor.sockId,
+          receiverName: assignedDoctor.name,
+          role: assignedDoctor.role,
+        });
+      }
+      
+      setIsLoading(false);
+    }
+  }, [setUser]);
+  
+  // Socket event handlers
+  const handleReceiveMessage = useCallback(({ message, fromId, senderName }) => {
+    console.log("Message received:", { message, fromId, senderName });
+    
+    // Update connection details if not set (for dynamic connections)
+    if (!connectionDetails.receiverSocketId && user?.Role === "Client") {
+      setConnectionDetails({
+        receiverSocketId: fromId,
+        receiverName: senderName,
+        role: "Doctor",
+      });
+    }
+    
+    // Handle doctor's client list management
+    if (user?.Role === "Doctor") {
+      setClientList(prevList => {
+        const existingClient = prevList.find(client => client.socketId === fromId);
+        
+        if (existingClient) {
+          // Update existing client's last message
+          return prevList.map(client =>
+            client.socketId === fromId
+              ? { ...client, lastMessage: message, timestamp: Date.now() }
+              : client
+          );
         } else {
-          if (!clientName) {
-            console.log("not");
-
-            setClientName(recieverName);
-          }
-          if (!currentClient) {
-            // setcurrentClient(recieverId)*
-            setcurrentClient(sendId);
-          }
-          // setClientId(sendId);
-          // clientIdRef.current = sendId;
+          // Add new client
+          return [...prevList, {
+            socketId: fromId,
+            clientName: senderName,
+            lastMessage: message,
+            timestamp: Date.now(),
+          }];
         }
-        const userMessage = { text: message, isBot: true };
-        let chatIndex;
-        if (user) {
-          chatIndex = senderId;
-        } else {
-          // chatIndex=currentClient?currentClient:sendId
-          // console.log(selectedClient);
-          chatIndex = sendId;
-        }
-
-        setChat((prevChat) => ({
-          ...prevChat,
-          [chatIndex]: [...(prevChat[chatIndex] || []), userMessage],
+      });
+      
+      // Auto-select first client if none selected
+      if (!selectedClientId) {
+        setSelectedClientId(fromId);
+      }
+      
+      // Update unread count for non-selected clients
+      if (selectedClientId !== fromId) {
+        setUnreadCounts(prev => ({
+          ...prev,
+          [fromId]: (prev[fromId] || 0) + 1,
         }));
-      };
-
-      socket.on("receive", handleReceive);
-
-      // Clean up listener on component unmount
-      return () => {
-        socket.off("receive", handleReceive);
-      };
+      }
     }
-  }, [socket, user, clientName]);
-
-  const handleSendMessage = async () => {
-    if (!input.trim()) return;
-
-    const userMessage = { text: input, isBot: false };
-    let sendIndex = user ? currentClient : selectedClient;
-    setChat((prevChat) => ({
-      ...prevChat,
-      // [currentClient]:[...(prevChat[currentClient]) || [],userMessage]
-      [sendIndex]: [...(prevChat[sendIndex] || []), userMessage],
+    
+    // Add message to chat data
+    const newMessage = {
+      id: Date.now() + Math.random(),
+      text: message,
+      isBot: true,
+      timestamp: Date.now(),
+      senderId: fromId,
+      senderName: senderName,
+    };
+    
+    setChatData(prevChats => ({
+      ...prevChats,
+      [fromId]: [...(prevChats[fromId] || []), newMessage],
     }));
-
-    if (socket) {
-      reciever = localStorage.getItem("reciever");
-      sender = doctor
-        ? localStorage.getItem("docSend")
-        : localStorage.getItem("sender");
-
-      const messageData = {
-        // reciever: user ? reciever : clientIdRef.current,
-        reciever: user ? reciever : selectedClient,
-        message: input,
-        sender: sender,
-        recieverName: user ? user : doctor,
-      };
-      socket.emit("sent", messageData);
-      setInput("");
-      messagesound.currentTime = 0;
-      send.currentTime = 0;
-      send.play();
+    
+    // Play notification sound
+    playSound(messageAudio);
+  }, [connectionDetails, user, selectedClientId, playSound]);
+  
+  // Socket listeners
+  useEffect(() => {
+    if (!socket) return;
+    
+    socket.on("receive-message", handleReceiveMessage);
+    
+    return () => {
+      socket.off("receive-message", handleReceiveMessage);
+    };
+  }, [handleReceiveMessage]);
+  
+  // Auto-scroll to bottom when messages change
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [chatData, scrollToBottom]);
+  
+  // Message sending logic
+  const handleSendMessage = useCallback(() => {
+    if (!messageInput.trim()) return;
+    
+    const targetReceiverId = user?.Role === "Doctor" 
+      ? selectedClientId 
+      : connectionDetails.receiverSocketId;
+    
+    if (!targetReceiverId) {
+      console.warn("No receiver selected");
+      return;
     }
-  };
-
-  const handleClient = (chat) => {
-    setSelectedClient(chat.socketId);
-    setClientName(chat.clientName);
-    setUnreadMessages((prevCount) => ({
-      ...prevCount,
-      [chat.socketId]: 0,
+    
+    // Create message object
+    const newMessage = {
+      id: Date.now() + Math.random(),
+      text: messageInput.trim(),
+      isBot: false,
+      timestamp: Date.now(),
+      senderId: socket.id,
+      senderName: user?.Name || user?.fullName,
+    };
+    
+    // Add to local chat data
+    setChatData(prevChats => ({
+      ...prevChats,
+      [targetReceiverId]: [...(prevChats[targetReceiverId] || []), newMessage],
     }));
+    
+    // Send via socket
+    const messageData = {
+      toId: targetReceiverId,
+      message: messageInput.trim(),
+      fromId: socket.id,
+      senderName: user?.Name || user?.fullName,
+    };
+    
+    socket.emit("send-message", messageData);
+    
+    // Clear input and play sound
+    setMessageInput("");
+    playSound(sendAudio);
+  }, [messageInput, user, selectedClientId, connectionDetails, playSound]);
+  
+  // Handle client selection (for doctors)
+  const handleClientSelect = useCallback((client) => {
+    setSelectedClientId(client.socketId);
+    
+    // Clear unread count for selected client
+    setUnreadCounts(prev => ({
+      ...prev,
+      [client.socketId]: 0,
+    }));
+  }, []);
+  
+  // Get current chat messages
+  const getCurrentMessages = () => {
+    const chatId = user?.Role === "Doctor" ? selectedClientId : connectionDetails.receiverSocketId;
+    return chatData[chatId] || [];
   };
-
+  
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("auth");
+    localStorage.removeItem("assignedDoctor");
+    // Add your logout logic here
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader color="#36d7b7" size={50} />
+      </div>
+    );
+  }
+  
   return (
     <div className="flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
       {/* Profile Box */}
@@ -199,15 +243,18 @@ const HealthBot = () => {
           </div>
         </div>
         <div className="font-bold flex justify-center w-full mt-4">
-          {user ? user : doctor}
+          {user?.Name || user?.fullName}
         </div>
         <div className="w-full flex justify-center mt-4">
-          <button className="font-bold px-4 py-1 bg-green-500 border-none text-white rounded-xl">
+          <button 
+            onClick={handleLogout}
+            className="font-bold px-4 py-1 bg-green-500 border-none text-white rounded-xl"
+          >
             Log Out
           </button>
         </div>
         <div className="bg-gray-100 w-52 p-2 rounded-2xl mx-auto lg:ml-12 mt-6 lg:mr-10">
-          Hii Glen!, Welcome back
+          Hii {user?.Name || "User"}!, Welcome back
         </div>
         <div className="w-full flex flex-col items-center mt-10">
           <p className="text-gray-400">Yesterday</p>
@@ -218,10 +265,10 @@ const HealthBot = () => {
       {/* Main Chat Container */}
       <div
         className={`container mx-auto px-4 py-8 ${
-          doctor ? "lg:w-[1000px]" : "lg:w-[700px]"
+          user?.Role == "Doctor" ? "lg:w-[1000px]" : "lg:w-[700px]"
         }`}
       >
-        {doctor && !selectedClient ? (
+        {user?.Role == "Doctor" && !selectedClientId ? (
           <div className="w-full flex justify-center items-center mt-40 flex-col gap-6 animate-fadeIn">
             <p className="text-green-800 text-2xl font-semibold animate-pulse tracking-wider">
               Finding clients...
@@ -237,7 +284,7 @@ const HealthBot = () => {
           <div>
             <div className="flex  mx-auto bg-white rounded-lg shadow-md overflow-hidden">
               {/* Sidebar for Doctor Chats */}
-              {doctor ? (
+              {user?.Role == "Doctor" ? (
                 <div className="w-2/4 border-r border-gray-200 p-4 ">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-left mb-4 text-gray-600">
@@ -245,31 +292,33 @@ const HealthBot = () => {
                     </h3>
                     <IoSearch size={20} className="mb-2 hover:cursor-pointer" />
                   </div>
-                  {doctorchat.map((chat, index) => (
-                    <div onClick={() => handleClient(chat)}
-                    key={index}
-                    className={` ${
-                      selectedClient === chat.socketId
-                        ? "bg-[#64F9FA]"
-                        : "bg-white"
-                    } p-3 rounded-lg mb-2 shadow-md border border-gray-200 cursor-pointer
-              transition duration-300 ease-in-out hover:bg-[#64F9FA] flex justify-between items-center`}>
+                  {clientList.map((client, index) => (
+                    <div
+                      onClick={() => handleClientSelect(client)}
+                      key={index}
+                      className={` ${
+                        selectedClientId === client.socketId
+                          ? "bg-[#64F9FA]"
+                          : "bg-white"
+                      } p-3 rounded-lg mb-2 shadow-md border border-gray-200 cursor-pointer
+              transition duration-300 ease-in-out hover:bg-[#64F9FA] flex justify-between items-center`}
+                    >
                       <div>
-                        <p className="font-semibold">{chat.clientName}</p>
+                        <p className="font-semibold">{client.clientName}</p>
                         <p className="text-gray-500 text-sm truncate">
-                          {chat.lastMessage}
+                          {client.lastMessage}
                         </p>
-                        
                       </div>
                       <div>
-                      {unreadMessages[chat.socketId] && selectedClient!==chat.socketId? (
+                        {unreadCounts[client.socketId] &&
+                        selectedClientId !== client.socketId ? (
                           <p className="text-white rounded-xl mr-4 h-6 w-6 text-center bg-[#64F9FA]">
-                            {unreadMessages[chat.socketId]}
+                            {unreadCounts[client.socketId]}
                           </p>
                         ) : (
                           ""
                         )}
-                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -288,17 +337,20 @@ const HealthBot = () => {
                     <div className="flex items-center">
                       <div className="h-12 w-12 bg-slate-50 rounded-full">
                         <img
-                          src={`${doctor ? userImg : docImg}`}
+                          src={`${user?.Role === "Doctor" ? userImg : docImg}`}
                           alt="doctor"
                           className="rounded-full"
                         />
                       </div>
                       <div className="pl-2">
                         <h2 className="text-xl font-semibold">
-                          {doctor ? clientName || "" : doctorName || ""}
+                          {user?.Role === "Doctor" 
+                            ? clientList.find(c => c.socketId === selectedClientId)?.clientName || "Client"
+                            : connectionDetails.receiverName
+                          }
                         </h2>
                         {user && (
-                          <p className="text-sm text-gray-600">{docRole}</p>
+                          <p></p>
                         )}
                       </div>
                     </div>
@@ -309,26 +361,32 @@ const HealthBot = () => {
                   </button>
                 </div>
                 <div className="h-96 overflow-y-auto p-6">
-                  {(chat[user ? currentClient : selectedClient] || []).map(
-                    (message, index) => (
+                  {getCurrentMessages().map((message, index) => (
+                    <div
+                      key={index}
+                      className={`mb-4 ${
+                        message.isBot ? "text-left" : "text-right"
+                      }`}
+                    >
                       <div
-                        key={index}
-                        className={`mb-4 ${
-                          message.isBot ? "text-left" : "text-right"
+                        className={`inline-block p-3 rounded-lg ${
+                          message.isBot
+                            ? "bg-gray-100"
+                            : "bg-blue-500 text-white"
                         }`}
                       >
-                        <div
-                          className={`inline-block p-3 rounded-lg ${
-                            message.isBot
-                              ? "bg-gray-100"
-                              : "bg-blue-500 text-white"
-                          }`}
-                        >
-                          {message.text}
-                        </div>
+                        <p className="text-sm">{message.text}</p>
+                        <p className={`text-xs mt-1 ${
+                          message.isBot ? "text-gray-500" : "text-blue-100"
+                        }`}>
+                          {new Date(message.timestamp).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
                       </div>
-                    )
-                  )}
+                    </div>
+                  ))}
                   <div ref={messagesEndRef} />
                 </div>
                 <div className="border-t p-4">
@@ -337,8 +395,8 @@ const HealthBot = () => {
                       type="text"
                       className="flex-grow mr-4 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-blue-400"
                       placeholder="Type your message..."
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
                       onKeyPress={(e) =>
                         e.key === "Enter" && handleSendMessage()
                       }

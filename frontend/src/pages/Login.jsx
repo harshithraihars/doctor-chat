@@ -7,6 +7,8 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import LeftSideBar from "../components/LeftSideBar";
 import { googleSignUp } from "../firebase/AuthFunction";
+import { socket } from "../Socket/Socket";
+import { setupSocket } from "../Socket/useSocketInit";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -16,12 +18,6 @@ const schema = yup.object().shape({
 const Login = () => {
   const navigate = useNavigate();
   const { user, setUser, doctor } = useAuth();
-  if (user) {
-    navigate("/home");
-  }
-  if (doctor) {
-    navigate("/health-bot");
-  }
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const {
@@ -31,6 +27,25 @@ const Login = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
+  const setUpUser = (user) => {
+    setUser({
+      Role: "Client",
+      Name: user,
+    });
+
+    localStorage.setItem(
+      "auth",
+      JSON.stringify({
+        Role: "Client",
+        Name: user,
+      })
+    );
+
+    navigate("/");
+
+    setupSocket({ Role: "Client", user: user });
+  };
 
   const onSubmit = async (data) => {
     setError(null);
@@ -44,21 +59,13 @@ const Login = () => {
         }
       );
 
-      // Assuming the response contains a token or user data:
       const { token, user } = response.data;
-      localStorage.setItem("user", user);
-      setUser(user);
-      if (localStorage.getItem("doctor")) {
-        localStorage.removeItem("doctor");
-      }
-      // Save the token in localStorage or use context/state management
-      localStorage.setItem("token", token);
 
-      // Navigate to the home page after successful login
-      navigate("/");
+      setUpUser(user);
+      localStorage.setItem("token", token);
     } catch (error) {
-      console.error("Login error:", error);
-      setError("Invalid email or password. Please try again.");
+      const serverMsg = error.response?.data?.message;
+      setError(serverMsg || "Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -67,37 +74,58 @@ const Login = () => {
   const handleGoogleSignUp = async () => {
     try {
       const user = await googleSignUp();
-      console.log("Welcome,", user.displayName);
-      navigate("/")
+      setUpUser(user.displayName);
     } catch (error) {
-      console.error("Google Sign-Up Failed:", error.message);
+      setError("Google Sign-Up Failed:");
+      console.log(error.message);
     }
   };
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#F0FDFF] via-[#E6FFFE] to-[#D1F5F7] py-4 px-4 flex items-center justify-center">
       <div className="w-full max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-8 items-center">
-          <LeftSideBar />
+        <div className="lg:grid lg:grid-cols-2 gap-8 items-center">
+          <div className="hidden lg:flex flex-col items-center justify-center space-y-6">
+            <LeftSideBar />
+
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-gray-800">
+                Welcome Back!
+              </h1>
+              <p className="text-gray-600 text-lg max-w-md">
+                Access your personalized healthcare dashboard and continue your
+                wellness journey
+              </p>
+
+              <div className="flex items-center justify-center space-x-6 pt-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-600">Secure Login</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-600">24/7 Support</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Right Side - Login Form */}
           <div className="w-full max-w-md mx-auto">
-            {/* Mobile Header */}
-            <div className="lg:hidden text-center mb-6">
+            <div className="lg:hidden text-center mb-8">
               <img
                 className="mx-auto mb-4 drop-shadow-lg"
                 src="src/assets/images/login.png"
-                alt="Healthcare"
+                alt="Healthcare Professional"
                 width="200"
                 height="200"
               />
               <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Welcome Back!
+                Welcome Doctor!
               </h1>
               <p className="text-gray-600">
-                Sign in to continue your health journey
+                Sign in to your professional dashboard
               </p>
             </div>
-
             {/* Login Card */}
             <div className="bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
               <div className="px-6 py-8">

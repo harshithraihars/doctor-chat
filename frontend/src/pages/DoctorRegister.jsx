@@ -62,41 +62,46 @@ const DoctorRegister = () => {
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Left Side - Image and Welcome Text */}
           <div className="hidden lg:flex flex-col items-center justify-center space-y-6">
-          <LeftSideBar/>
-          
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-gray-800">
-              Welcome Back!
-            </h1>
-            <p className="text-gray-600 text-lg max-w-md">
-              Access your personalized healthcare dashboard and continue your wellness journey
-            </p>
-            
-            <div className="flex items-center justify-center space-x-6 pt-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm text-gray-600">Secure Login</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-                <span className="text-sm text-gray-600">24/7 Support</span>
+            <LeftSideBar />
+
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-gray-800">
+                Welcome Back!
+              </h1>
+              <p className="text-gray-600 text-lg max-w-md">
+                Access your personalized healthcare dashboard and continue your
+                wellness journey
+              </p>
+
+              <div className="flex items-center justify-center space-x-6 pt-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-600">Secure Login</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-600">24/7 Support</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
           {/* Right Side - Register Form */}
           <div className="w-full max-w-lg mx-auto">
             {/* Mobile Header */}
-            <div className="lg:hidden text-center mb-6">
-              <div className="mx-auto mb-4 w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full flex items-center justify-center shadow-lg">
-                <div className="text-3xl">👨‍⚕️</div>
-              </div>
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                Join Our Medical Team!
+            <div className="lg:hidden text-center mb-8">
+              <img
+                className="mx-auto mb-4 drop-shadow-lg"
+                src="src/assets/images/login.png"
+                alt="Healthcare Professional"
+                width="200"
+                height="200"
+              />
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                Welcome Doctor!
               </h1>
-              <p className="text-gray-600 text-sm">
-                Register as a healthcare professional
+              <p className="text-gray-600">
+                Sign in to your professional dashboard
               </p>
             </div>
 
@@ -464,12 +469,11 @@ const DoctorRegister = () => {
                       className="font-semibold text-cyan-600 hover:text-cyan-800 transition-colors duration-200 inline-flex items-center"
                     >
                       Patient Registration
-                     
                     </Link>
                   </p>
                 </div>
               </div>
-            </div>            
+            </div>
           </div>
         </div>
       </div>
