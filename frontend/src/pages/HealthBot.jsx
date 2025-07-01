@@ -10,11 +10,12 @@ import { IoSearch } from "react-icons/io5";
 import { useAuth } from "../contexts/AuthContext";
 import { ClipLoader } from "react-spinners";
 import { socket } from "../Socket/Socket";
+import ProfileSidebar from "../components/ProfileSideBar";
 
 const HealthBot = () => {
   // Audio instances
-  const sendAudio = useRef(new Audio(sendSound));
-  const messageAudio = useRef(new Audio(messageSound));
+  const sendAudio = new Audio(sendSound)
+  const messageAudio = new Audio(messageSound)
   
   // Auth context
   const { user, setUser } = useAuth();
@@ -36,13 +37,12 @@ const HealthBot = () => {
   // Refs
   const messagesEndRef = useRef(null);
   
-  // Helper functions
-  const playSound = useCallback((audioRef) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(console.error);
-    }
-  }, []);
+  // Helper function
+  const playSound=(audio)=>{
+    sendAudio.currentTime=0;
+    messageAudio.currentTime=0;
+    audio.play()
+  }
   
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -231,38 +231,12 @@ const HealthBot = () => {
   
   return (
     <div className="flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
-      {/* Profile Box */}
-      <div className="w-4/5 lg:w-1/5 h-[500px] border-2 border-black border-solid mt-10 mx-auto lg:ml-20 rounded-[30px] bg-[#64F9FA]">
-        <div className="mt-12 w-full flex items-center justify-center">
-          <div>
-            <img
-              src="src/assets/images/profile.png"
-              alt="profile"
-              className="w-24 h-24 sm:w-20 sm:h-20 lg:w-24 lg:h-24"
-            />
-          </div>
-        </div>
-        <div className="font-bold flex justify-center w-full mt-4">
-          {user?.Name || user?.fullName}
-        </div>
-        <div className="w-full flex justify-center mt-4">
-          <button 
-            onClick={handleLogout}
-            className="font-bold px-4 py-1 bg-green-500 border-none text-white rounded-xl"
-          >
-            Log Out
-          </button>
-        </div>
-        <div className="bg-gray-100 w-52 p-2 rounded-2xl mx-auto lg:ml-12 mt-6 lg:mr-10">
-          Hii {user?.Name || "User"}!, Welcome back
-        </div>
-        <div className="w-full flex flex-col items-center mt-10">
-          <p className="text-gray-400">Yesterday</p>
-          <div>Greeting Exchange...</div>
-        </div>
-      </div>
 
+      {/* Profile Box */}
+      <ProfileSidebar user={user} handleLogout={handleLogout}/>
       {/* Main Chat Container */}
+
+      
       <div
         className={`container mx-auto px-4 py-8 ${
           user?.Role == "Doctor" ? "lg:w-[1000px]" : "lg:w-[700px]"
@@ -349,9 +323,7 @@ const HealthBot = () => {
                             : connectionDetails.receiverName
                           }
                         </h2>
-                        {user && (
-                          <p></p>
-                        )}
+                        <p className="text-green-500 font-semibold">online</p>
                       </div>
                     </div>
                   </div>
@@ -414,6 +386,10 @@ const HealthBot = () => {
           </div>
         )}
       </div>
+
+
+
+
     </div>
   );
 };

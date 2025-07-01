@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { socket } from "../Socket/Socket";
 const SelectSpecialist = () => {
-  const { setSpecialist, user } = useAuth();
+  const { setSpecialist, user, availableDoctors } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +30,6 @@ const SelectSpecialist = () => {
     };
   }, [navigate]);
 
-
   const handleClick = (specialist) => {
     setLoading(true);
     setSpecialist(specialist);
@@ -39,7 +38,8 @@ const SelectSpecialist = () => {
       userId: user?.id || user?._id, // pass user ID
     });
   };
-
+  console.log(availableDoctors);
+  
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0] py-8 px-4">
       <div className="max-w-7xl mx-auto">
@@ -67,9 +67,11 @@ const SelectSpecialist = () => {
                 <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8"></div>
 
                 {/* Status Badge */}
-                <div className="absolute top-4 right-4 bg-green-400 text-white text-xs px-2 py-1 rounded-full font-medium">
-                  Available
-                </div>
+                {availableDoctors?.has(item.name) && (
+                  <div className="absolute top-4 right-4 bg-green-400 text-white text-xs px-2 py-1 rounded-full font-medium">
+                    Available
+                  </div>
+                )}
 
                 {/* Specialist Name */}
                 <h2 className="font-bold text-gray-800 text-xl mb-2 text-center z-10 relative">

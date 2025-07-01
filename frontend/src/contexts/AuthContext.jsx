@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [specialist, setSpecialist] = useState(null);
   const [doctorId, setDoctorId] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [availableDoctors,setAvailableDoctors]=useState(new Set())
   const login = async (email, password) => {
     try {
       const response = await axios.post(
@@ -89,6 +90,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    setAvailableDoctors,
+    availableDoctors
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

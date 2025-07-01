@@ -3,22 +3,25 @@ const Doctor = require("../models/Doctor");
 const userSocketMap = new Map(); // userId → socketId
 const socketUserMap = new Map(); // socketId → { id, role, name }
 const doctorClientMap = new Map(); // doctorId → Set of userIds
-const specializationMap = new Map();
+// const specializationMap = new Map();
+const availabeSpecializiation = new Set();
 module.exports = (io) => {
   io.on("connection", (socket) => {
-    console.log("🔌 Socket connected:", socket.id);
-
     socket.on("Client-login", ({ id, role, name }) => {
       userSocketMap.set(id, socket.id);
       socketUserMap.set(socket.id, { id, role, name });
 
       console.log(` ${role} connected: ${name} (${id})`);
+
+      setTimeout(() => {
+        socket.emit("available-doctors",[...availabeSpecializiation]);
+      }, 100);
     });
 
     socket.on("Doctor-login", async ({ id }) => {
       const doc = await Doctor.findOne({ docId: id });
       console.log("doctor loggedin");
-      
+
       if (doc) {
         userSocketMap.set(id, socket.id);
         socketUserMap.set(socket.id, {
@@ -26,7 +29,7 @@ module.exports = (io) => {
           role: doc.specialization,
           name: doc.name,
         });
-
+        availabeSpecializiation.add(doc.specialization);
         console.log(`🩺 Doctor logged in: ${doc.name} (${doc.specialization})`);
       }
     });
@@ -63,13 +66,13 @@ module.exports = (io) => {
       socket.emit("doctor-id", {
         role: specialization,
         name: selected.user.name,
-        sockId:selected.sockId
+        sockId: selected.sockId,
       });
     });
 
     socket.on("send-message", ({ toId, message, fromId, senderName }) => {
-      console.log(toId,message,fromId,senderName);
-      
+      console.log(toId, message, fromId, senderName);
+
       const toSocketId = userSocketMap.get(toId);
       if (toId) {
         io.to(toId).emit("receive-message", {
