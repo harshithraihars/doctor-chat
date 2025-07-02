@@ -12,6 +12,7 @@ import { ClipLoader } from "react-spinners";
 import { socket } from "../Socket/Socket";
 import ProfileSidebar from "../components/ProfileSideBar";
 import Loading from "./Loading";
+import SelectSpecialist from "./SelectSpecialist";
 
 const HealthBot = () => {
   // Audio instances
@@ -19,7 +20,7 @@ const HealthBot = () => {
   const messageAudio = new Audio(messageSound);
 
   // Auth context
-  const { user, setUser } = useAuth();
+  const { user, setUser,specialist,chatData,setChatData} = useAuth();
 
   // State management
   const [connectionDetails, setConnectionDetails] = useState({
@@ -27,8 +28,7 @@ const HealthBot = () => {
     receiverSocketId: null,
     role: null,
   });
-
-  const [chatData, setChatData] = useState({}); // Store all chat conversations
+  
   const [selectedClientId, setSelectedClientId] = useState(null); // Currently selected client for doctor
   const [clientList, setClientList] = useState([]); // List of clients for doctor sidebar
   const [unreadCounts, setUnreadCounts] = useState({}); // Unread message counts
@@ -233,6 +233,10 @@ const HealthBot = () => {
     localStorage.removeItem("assignedDoctor");
     // Add your logout logic here
   };
+
+  if(user.Role=="Client" && !specialist){
+    return (<SelectSpecialist/>)
+  }
 
   if (isLoading) {
     return (

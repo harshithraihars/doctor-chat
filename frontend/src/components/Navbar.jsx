@@ -38,6 +38,8 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  console.log(user);
+  
   return (
     <nav className="bg-[#B2EBF2] shadow-2xl backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,12 +88,12 @@ const Navbar = () => {
                 </Link>
 
                 {/* Notifications */}
-                <button className="relative p-2 text-gray-800 hover:bg-cyan-200/50 rounded-lg transition-all duration-300">
+                {/* <button className="relative p-2 text-gray-800 hover:bg-cyan-200/50 rounded-lg transition-all duration-300">
                   <Bell className="h-5 w-5" />
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     3
                   </span>
-                </button>
+                </button> */}
 
                 {/* User Profile */}
                 <div className="flex items-center space-x-3 pl-4 border-l border-gray-400">
@@ -101,7 +103,7 @@ const Navbar = () => {
                       <div className="text-gray-800 text-sm font-medium">
                         Welcome back!
                       </div>
-                      <div className="text-gray-600 text-xs">Patient</div>
+                      <div className="text-gray-600 text-sm font-bold">{user?.Name}</div>
                     </div>
                   </div>
 
@@ -120,8 +122,8 @@ const Navbar = () => {
                 <div className="flex items-center space-x-3 px-4 py-2 bg-gray-800/10 rounded-lg">
                   <Stethoscope className="h-6 w-6 text-green-600" />
                   <div className="text-left">
-                    <div className="text-gray-800 text-sm font-medium">
-                      Dr. Portal
+                    <div className="text-gray-800 text-xl font-medium">
+                      {user?.Name}
                     </div>
                     <div className="text-green-600 text-xs">
                       Medical Professional
@@ -158,13 +160,13 @@ const Navbar = () => {
                     <span className="font-medium">Login</span>
                   </Link>
 
-                  <Link
+                  {/* <Link
                     to="/register"
                     className="flex items-center px-4 py-2 bg-gray-800 text-white hover:bg-gray-700 rounded-lg transition-all duration-300 font-medium group"
                   >
                     <Heart className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
                     <span>Get Started</span>
-                  </Link>
+                  </Link> */}
                 </div>
               </>
             )}
@@ -207,7 +209,7 @@ const Navbar = () => {
               </div>
 
               <Link
-                to="/home"
+                to="/"
                 className="flex items-center px-4 py-3 text-white hover:bg-white/20 rounded-lg transition-all duration-300 mb-2"
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -243,7 +245,7 @@ const Navbar = () => {
                 <div>
                   <div className="text-white font-medium">Doctor Portal</div>
                   <div className="text-green-200 text-sm">
-                    Medical Professional
+                    
                   </div>
                 </div>
               </div>

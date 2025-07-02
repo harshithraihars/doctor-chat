@@ -14,6 +14,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [doctor, setDoctor] = useState(null);
+  const [chatData, setChatData] = useState({});
   const [senderId, setSenderId] = useState(null);
   const [recieverId, setRecieverId] = useState(null);
   const [specialist, setSpecialist] = useState(null);
@@ -92,7 +93,9 @@ export const AuthProvider = ({ children }) => {
     logout,
     setAvailableDoctors,
     availableDoctors,
-    specialist
+    specialist,
+    chatData,
+    setChatData
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
