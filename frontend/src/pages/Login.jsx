@@ -9,6 +9,7 @@ import LeftSideBar from "../components/LeftSideBar";
 import { googleSignUp } from "../firebase/AuthFunction";
 import { socket } from "../Socket/Socket";
 import { setupSocket } from "../Socket/useSocketInit";
+import { ClipLoader } from "react-spinners";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -17,9 +18,10 @@ const schema = yup.object().shape({
 
 const Login = () => {
   const navigate = useNavigate();
-  const { user, setUser, doctor } = useAuth();
+  const { setUser } = useAuth();
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [googleSignupLoading, setGoogleSignUpLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -73,11 +75,14 @@ const Login = () => {
 
   const handleGoogleSignUp = async () => {
     try {
+      setGoogleSignUpLoading(true);
       const user = await googleSignUp();
       setUpUser(user.displayName);
     } catch (error) {
       setError("Google Sign-Up Failed:");
       console.log(error.message);
+    } finally {
+      setGoogleSignUpLoading(false);
     }
   };
   return (
@@ -320,14 +325,21 @@ const Login = () => {
                 {/* Google Sign In Button - Now properly aligned within the main form area */}
                 <button
                   onClick={handleGoogleSignUp}
-                  className="w-full flex items-center justify-center gap-3 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300 py-2.5 px-4 rounded-xl transition-all duration-300 hover:border-gray-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-200 font-medium"
+                  className={`w-full  bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300 py-2.5 px-4 rounded-xl transition-all duration-300 hover:border-gray-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-200 font-medium`}
                 >
-                  <img
+                  {googleSignupLoading ? (
+                    <div className="flex gap-3 items-center justify-center">
+                      <ClipLoader size={15}/>
+                      <span className="text-gray-400">Loading...</span>
+                    </div>
+                  ):(<div className="flex items-center justify-center gap-3">
+                    <img
                     src="src/assets/images/google.png"
                     alt="Google Logo"
                     className="w-5 h-5"
                   />
                   <span className="text-sm">Sign in with Google</span>
+                    </div>)}
                 </button>
               </div>
 

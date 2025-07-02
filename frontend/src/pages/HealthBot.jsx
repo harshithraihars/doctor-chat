@@ -13,6 +13,7 @@ import { socket } from "../Socket/Socket";
 import ProfileSidebar from "../components/ProfileSideBar";
 import Loading from "./Loading";
 import SelectSpecialist from "./SelectSpecialist";
+import HealthBotMobileTablet from "./HealthBotResponsive";
 
 const HealthBot = () => {
   // Audio instances
@@ -20,7 +21,7 @@ const HealthBot = () => {
   const messageAudio = new Audio(messageSound);
 
   // Auth context
-  const { user, setUser,specialist,chatData,setChatData} = useAuth();
+  const { user, setUser, specialist, chatData, setChatData } = useAuth();
 
   // State management
   const [connectionDetails, setConnectionDetails] = useState({
@@ -28,7 +29,7 @@ const HealthBot = () => {
     receiverSocketId: null,
     role: null,
   });
-  
+
   const [selectedClientId, setSelectedClientId] = useState(null); // Currently selected client for doctor
   const [clientList, setClientList] = useState([]); // List of clients for doctor sidebar
   const [unreadCounts, setUnreadCounts] = useState({}); // Unread message counts
@@ -234,8 +235,8 @@ const HealthBot = () => {
     // Add your logout logic here
   };
 
-  if(user.Role=="Client" && !specialist){
-    return (<SelectSpecialist/>)
+  if (user.Role == "Client" && !specialist) {
+    return <SelectSpecialist />;
   }
 
   if (isLoading) {
@@ -246,153 +247,183 @@ const HealthBot = () => {
     );
   }
 
+  const commonProps = {
+    user,
+    specialist,
+    connectionDetails,
+    selectedClientId,
+    setSelectedClientId,
+    clientList,
+    unreadCounts,
+    messageInput,
+    setMessageInput,
+    handleSendMessage,
+    handleClientSelect,
+    getCurrentMessages,
+    handleLogout,
+    messagesEndRef,
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
-      {/* Profile Box */}
-      <ProfileSidebar user={user} handleLogout={handleLogout} />
-      {/* Main Chat Container */}
+    <div>
+      <div className="hidden  lg:flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
+        {/* Profile Box */}
+        <ProfileSidebar user={user} handleLogout={handleLogout} />
+        {/* Main Chat Container */}
 
-      <div
-        className={`container mx-auto px-4 py-8 ${
-          user?.Role == "Doctor" ? "lg:w-[1000px]" : "lg:w-[700px]"
-        }`}
-      >
-        {user?.Role == "Doctor" && !selectedClientId ? (
-          <Loading/>
-        ) : (
-          <div>
-            <div className="flex  mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-              {/* Sidebar for Doctor Chats */}
-              {user?.Role == "Doctor" ? (
-                <div className="w-2/4 border-r border-gray-200 p-4 ">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-left mb-4 text-gray-600">
-                      Chats
-                    </h3>
-                    <IoSearch size={20} className="mb-2 hover:cursor-pointer" />
-                  </div>
-                  {clientList.map((client, index) => (
-                    <div
-                      onClick={() => handleClientSelect(client)}
-                      key={index}
-                      className={` ${
-                        selectedClientId === client.socketId
-                          ? "bg-[#64F9FA]"
-                          : "bg-white"
-                      } p-3 rounded-lg mb-2 shadow-md border border-gray-200 cursor-pointer
-              transition duration-300 ease-in-out hover:bg-[#64F9FA] flex justify-between items-center`}
-                    >
-                      <div>
-                        <p className="font-semibold">{client.clientName}</p>
-                        <p className="text-gray-500 text-sm truncate">
-                          {client.lastMessage}
-                        </p>
-                      </div>
-                      <div>
-                        {unreadCounts[client.socketId] &&
-                        selectedClientId !== client.socketId ? (
-                          <p className="text-white rounded-xl mr-4 h-6 w-6 text-center bg-[#64F9FA]">
-                            {unreadCounts[client.socketId]}
-                          </p>
-                        ) : (
-                          ""
-                        )}
-                      </div>
+        <div
+          className={`container mx-auto px-4 py-8 ${
+            user?.Role == "Doctor" ? "lg:w-[1000px]" : "lg:w-[700px]"
+          }`}
+        >
+          {user?.Role == "Doctor" && !selectedClientId ? (
+            <Loading />
+          ) : (
+            <div>
+              <div className="flex  mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                {/* Sidebar for Doctor Chats */}
+                {user?.Role == "Doctor" ? (
+                  <div className="w-2/4 border-r border-gray-200 p-4 ">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-left mb-4 text-gray-600">
+                        Chats
+                      </h3>
+                      <IoSearch
+                        size={20}
+                        className="mb-2 hover:cursor-pointer"
+                      />
                     </div>
-                  ))}
-                </div>
-              ) : (
-                ""
-              )}
-
-              {/* Chat Area */}
-              <div className="w-2/3 lg:w-[700px] rounded-xl">
-                <div className="bg-[#64f9fa] text-black px-3 py-3 flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <button className="text-xl font-bold text-gray-700">
-                      <FaArrowLeft size={30} />
-                    </button>
-
-                    <div className="flex items-center">
-                      <div className="h-12 w-12 bg-slate-50 rounded-full">
-                        <img
-                          src={`${user?.Role === "Doctor" ? userImg : docImg}`}
-                          alt="doctor"
-                          className="rounded-full"
-                        />
-                      </div>
-                      <div className="pl-2">
-                        <h2 className="text-xl font-semibold">
-                          {user?.Role === "Doctor"
-                            ? clientList.find(
-                                (c) => c.socketId === selectedClientId
-                              )?.clientName || "Client"
-                            : connectionDetails.receiverName}
-                        </h2>
-                        <p className="text-green-500 font-semibold">online</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button className="text-xl font-bold text-gray-700">
-                    <HiDotsVertical size={25} className="text-black" />
-                  </button>
-                </div>
-                <div className="h-96 overflow-y-auto p-6">
-                  {getCurrentMessages().map((message, index) => (
-                    <div
-                      key={index}
-                      className={`mb-4 ${
-                        message.isBot ? "text-left" : "text-right"
-                      }`}
-                    >
+                    {clientList.map((client, index) => (
                       <div
-                        className={`inline-block p-3 rounded-lg ${
-                          message.isBot
-                            ? "bg-gray-100"
-                            : "bg-blue-500 text-white"
+                        onClick={() => handleClientSelect(client)}
+                        key={index}
+                        className={` ${
+                          selectedClientId === client.socketId
+                            ? "bg-[#64F9FA]"
+                            : "bg-white"
+                        } p-3 rounded-lg mb-2 shadow-md border border-gray-200 cursor-pointer
+              transition duration-300 ease-in-out hover:bg-[#64F9FA] flex justify-between items-center`}
+                      >
+                        <div>
+                          <p className="font-semibold">{client.clientName}</p>
+                          <p className="text-gray-500 text-sm truncate">
+                            {client.lastMessage}
+                          </p>
+                        </div>
+                        <div>
+                          {unreadCounts[client.socketId] &&
+                          selectedClientId !== client.socketId ? (
+                            <p className="text-white rounded-xl mr-4 h-6 w-6 text-center bg-[#64F9FA]">
+                              {unreadCounts[client.socketId]}
+                            </p>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  ""
+                )}
+
+                {/* Chat Area */}
+                <div className="w-2/3 lg:w-[700px] rounded-xl">
+                  <div className="bg-[#64f9fa] text-black px-3 py-3 flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <button className="text-xl font-bold text-gray-700">
+                        <FaArrowLeft size={30} />
+                      </button>
+
+                      <div className="flex items-center">
+                        <div className="h-12 w-12 bg-slate-50 rounded-full">
+                          <img
+                            src={`${
+                              user?.Role === "Doctor" ? userImg : docImg
+                            }`}
+                            alt="doctor"
+                            className="rounded-full"
+                          />
+                        </div>
+                        <div className="pl-2">
+                          <h2 className="text-xl font-semibold">
+                            {user?.Role === "Doctor"
+                              ? clientList.find(
+                                  (c) => c.socketId === selectedClientId
+                                )?.clientName || "Client"
+                              : connectionDetails.receiverName}
+                          </h2>
+                          <p className="text-green-500 font-semibold">online</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button className="text-xl font-bold text-gray-700">
+                      <HiDotsVertical size={25} className="text-black" />
+                    </button>
+                  </div>
+                  <div className="h-96 overflow-y-auto p-6">
+                    {getCurrentMessages().map((message, index) => (
+                      <div
+                        key={index}
+                        className={`mb-4 ${
+                          message.isBot ? "text-left" : "text-right"
                         }`}
                       >
-                        <p className="text-sm">{message.text}</p>
-                        <p
-                          className={`text-xs mt-1 ${
-                            message.isBot ? "text-gray-500" : "text-blue-100"
+                        <div
+                          className={`inline-block p-3 rounded-lg ${
+                            message.isBot
+                              ? "bg-gray-100"
+                              : "bg-blue-500 text-white"
                           }`}
                         >
-                          {new Date(message.timestamp).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
+                          <p className="text-sm">{message.text}</p>
+                          <p
+                            className={`text-xs mt-1 ${
+                              message.isBot ? "text-gray-500" : "text-blue-100"
+                            }`}
+                          >
+                            {new Date(message.timestamp).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+                          </p>
+                        </div>
                       </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </div>
+                  <div className="border-t p-4">
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        className="flex-grow mr-4 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-blue-400"
+                        placeholder="Type your message..."
+                        value={messageInput}
+                        onChange={(e) => setMessageInput(e.target.value)}
+                        onKeyPress={(e) =>
+                          e.key === "Enter" && handleSendMessage()
+                        }
+                      />
+                      <button
+                        className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition duration-300"
+                        onClick={handleSendMessage}
+                      >
+                        <Send size={20} />
+                      </button>
                     </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-                <div className="border-t p-4">
-                  <div className="flex items-center">
-                    <input
-                      type="text"
-                      className="flex-grow mr-4 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-blue-400"
-                      placeholder="Type your message..."
-                      value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}
-                      onKeyPress={(e) =>
-                        e.key === "Enter" && handleSendMessage()
-                      }
-                    />
-                    <button
-                      className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition duration-300"
-                      onClick={handleSendMessage}
-                    >
-                      <Send size={20} />
-                    </button>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
+      <div className="block lg:hidden">
+        <HealthBotMobileTablet {...commonProps} />
       </div>
     </div>
   );
