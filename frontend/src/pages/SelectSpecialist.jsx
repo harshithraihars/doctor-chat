@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
 import specialists from "../components/SpecialistList";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { socket } from "../Socket/Socket";
+import SpecialistUnavailable from "./SpecialistUnAvailable";
+import { useEffect, useState } from "react";
 const SelectSpecialist = () => {
-  const { setSpecialist, user, availableDoctors } = useAuth();
+  const [showUnavailable, setShowUnavailable] = useState(false);
+  const { setSpecialist, user, availableDoctors,specialist} = useAuth();
+  const [selectedSpecialist, setSelectedSpecialist] = useState(null);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -13,6 +16,8 @@ const SelectSpecialist = () => {
       if (error) {
         console.error("Doctor assignment failed:", error);
         setLoading(false);
+
+        setShowUnavailable(true);
         return;
       }
 
@@ -33,13 +38,21 @@ const SelectSpecialist = () => {
   const handleClick = (specialist) => {
     setLoading(true);
     setSpecialist(specialist);
+    setSelectedSpecialist(specialist);
     socket.emit("specialization", {
       specialization: specialist,
       userId: user?.id || user?._id, // pass user ID
     });
   };
-  console.log(availableDoctors);
-  
+
+  if (showUnavailable) {
+    return (
+      <SpecialistUnavailable
+        specialistName={specialist}
+        onClose={()=>setShowUnavailable(false)}
+      />
+    );
+  }
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0] py-8 px-4">
       <div className="max-w-7xl mx-auto">

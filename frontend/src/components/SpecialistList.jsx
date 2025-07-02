@@ -14,7 +14,7 @@ const specialists=[
         imgsrc:cardiolo
     },
     {
-        name:"Dermotologist",
+        name:"Dermatologist",
         desc:"Focuses on Skin,hair and nail Conditions",
         imgsrc:derma
     },

@@ -70,7 +70,7 @@ const Navbar = () => {
               // Patient Navigation
               <>
                 <Link
-                  to="/home"
+                  to="/"
                   className="flex items-center px-4 py-2 text-gray-800 hover:bg-cyan-200/50 rounded-lg transition-all duration-300 group"
                 >
                   <Home className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />

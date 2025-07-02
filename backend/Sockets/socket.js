@@ -36,6 +36,10 @@ module.exports = (io) => {
 
     // When a user requests a doctor of a specific specialization
     socket.on("specialization", ({ specialization, userId }) => {
+
+      console.log(specialization);
+      console.log(socketUserMap);
+      
       const availableDoctors = [];
 
       for (const [sockId, user] of socketUserMap.entries()) {
@@ -63,6 +67,9 @@ module.exports = (io) => {
       }
       doctorClientMap.get(selected.user.id).add(userId);
 
+      
+      
+      
       socket.emit("doctor-id", {
         role: specialization,
         name: selected.user.name,
