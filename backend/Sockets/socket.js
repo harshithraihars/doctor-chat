@@ -57,6 +57,19 @@ module.exports = (io) => {
       });
 
       const selected = availableDoctors[0]; // least busy doctor
+      console.log(peerMap);
+      console.log(selected.sockId);
+      
+      
+      
+      if (
+        peerMap.get(selected.sockId) &&
+        peerMap.get(selected.sockId)?.size > 5
+      ) {
+        return socket.emit("doctor-id", {
+          error: "All Doctors are Busy Please wait",
+        });
+      }
 
       if (!doctorClientMap.has(selected.user.id)) {
         doctorClientMap.set(selected.user.id, new Set());
@@ -116,15 +129,12 @@ module.exports = (io) => {
 
       console.log(" Disconnected:", socket.id);
 
-      console.log(peerMap);
-
       // send the peer disconnected message to all th other peers connected to it
       const peersConnected = peerMap.get(socket.id);
       if (peersConnected) {
         for (const peerSocketId of peersConnected) {
           const peerSocket = io.sockets.sockets.get(peerSocketId);
           if (peerSocket) {
-            console.log("peer found");
             peerSocket.emit("peer-disconnected", {
               peerId: socket.id,
             });
@@ -139,7 +149,6 @@ module.exports = (io) => {
 
         peerMap.delete(socket.id);
       }
-
     });
   });
 };

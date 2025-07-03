@@ -56,7 +56,7 @@ const SpecialistUnavailable = ({ specialistName, onClose }) => {
           {/* Message */}
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-8 relative z-10">
             <p className="text-red-800 text-center font-medium">
-              {specialistName} is currently not available
+              {specialistName} is currently not available or is Busy
             </p>
             <p className="text-red-600 text-center text-sm mt-1">
               Please try again later or choose another specialist for immediate

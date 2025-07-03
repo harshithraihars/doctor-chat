@@ -210,6 +210,9 @@ const HealthBot = () => {
     playSound(sendAudio);
   }, [messageInput, user, selectedClientId, connectionDetails, playSound]);
 
+
+
+
   // Handle client selection (for doctors)
   const handleClientSelect = useCallback((client) => {
     setSelectedClientId(client.socketId);
@@ -280,7 +283,6 @@ const HealthBot = () => {
   }
 
 
-  console.log(specialist);
   
   return (
     <div>

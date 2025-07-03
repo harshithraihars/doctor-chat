@@ -15,6 +15,8 @@ const SelectSpecialist = () => {
     const handleDoctorAssigned = ({ role, name, sockId, error }) => {
       if (error) {
         console.error("Doctor assignment failed:", error);
+        console.log(error);
+        
         setLoading(false);
 
         setShowUnavailable(true);
