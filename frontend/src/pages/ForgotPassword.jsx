@@ -32,7 +32,7 @@ const ForgotPassword = () => {
       if (currentStep === 1) {
         setIsLoading(true);
         const response = await axios.post(
-          "http://localhost:5000/api/auth/forgot-password", // Backend API endpoint
+          "https://doctor-chat-8184.onrender.com/api/auth/forgot-password", // Backend API endpoint
           {
             email: formData.email,
           }
@@ -49,7 +49,7 @@ const ForgotPassword = () => {
       if (currentStep === 2) {
         setIsLoading(true);
         const response = await axios.post(
-          "http://localhost:5000/api/auth/verify-otp", // Backend API endpoint
+          "https://doctor-chat-8184.onrender.com/api/auth/verify-otp", // Backend API endpoint
           {
             email: formData.email,
             otp: formData.otp,
@@ -75,7 +75,7 @@ const ForgotPassword = () => {
 
         setIsLoading(true);
         const response = await axios.post(
-          "http://localhost:5000/api/auth/reset-password", // Backend API endpoint
+          "https://doctor-chat-8184.onrender.com/api/auth/reset-password", // Backend API endpoint
           {
             email: formData.email,
             password: formData.password,

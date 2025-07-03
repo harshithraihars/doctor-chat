@@ -32,7 +32,7 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://doctor-chat-8184.onrender.com/api/auth/register",
         {
           email: data.email,
           password: data.password,

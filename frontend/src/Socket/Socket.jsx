@@ -2,7 +2,7 @@
 
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000", {
+const socket = io("https://doctor-chat-8184.onrender.com", {
   autoConnect: false,
   transports: ["websocket"],
   withCredentials: true,

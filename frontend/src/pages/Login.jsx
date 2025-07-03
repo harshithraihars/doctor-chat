@@ -54,7 +54,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login", // Backend API endpoint
+        "https://doctor-chat-8184.onrender.com/api/auth/login", // Backend API endpoint
         {
           email: data.email,
           password: data.password,

@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { Send } from "lucide-react";
 import sendSound from "../assets/images/send.mp3";
 import messageSound from "../assets/images/message.mp3";
@@ -22,7 +28,8 @@ const HealthBot = () => {
   const messageAudio = new Audio(messageSound);
 
   // Auth context
-  const { user, setUser, specialist, chatData, setChatData,setSpecialist } = useAuth();
+  const { user, setUser, specialist, chatData, setChatData, setSpecialist } =
+    useAuth();
 
   // State management
   const [connectionDetails, setConnectionDetails] = useState({
@@ -31,14 +38,24 @@ const HealthBot = () => {
     role: null,
   });
 
-  const [selectedClientId, setSelectedClientId] = useState(null); // Currently selected client for doctor
-  const [clientList, setClientList] = useState([]); // List of clients for doctor sidebar
-  const [unreadCounts, setUnreadCounts] = useState({}); // Unread message counts
+  const [selectedClientId, setSelectedClientId] = useState(null);
+  const [clientList, setClientList] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
   const [messageInput, setMessageInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [peerDisconnnected, setPeerDisconnected] = useState(false);
-  // Refs
+
+  // Fixed refs - use only one scroll container ref
+  const scrollContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
+
+  // Improved scroll function
+  const scrollToBottom = useCallback(() => {
+    if (scrollContainerRef.current) {
+      const scrollContainer = scrollContainerRef.current;
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
+  }, []);
 
   // Helper function
   const playSound = (audio) => {
@@ -46,10 +63,6 @@ const HealthBot = () => {
     messageAudio.currentTime = 0;
     audio.play();
   };
-
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
 
   // Initialize connection details from localStorage
   useEffect(() => {
@@ -65,7 +78,7 @@ const HealthBot = () => {
           receiverName: assignedDoctor.name,
           role: assignedDoctor.role,
         });
-        setSpecialist(assignedDoctor.role)
+        setSpecialist(assignedDoctor.role);
       }
 
       setIsLoading(false);
@@ -94,14 +107,12 @@ const HealthBot = () => {
           );
 
           if (existingClient) {
-            // Update existing client's last message
             return prevList.map((client) =>
               client.socketId === fromId
                 ? { ...client, lastMessage: message, timestamp: Date.now() }
                 : client
             );
           } else {
-            // Add new client
             return [
               ...prevList,
               {
@@ -114,12 +125,10 @@ const HealthBot = () => {
           }
         });
 
-        // Auto-select first client if none selected
         if (!selectedClientId) {
           setSelectedClientId(fromId);
         }
 
-        // Update unread count for non-selected clients
         if (selectedClientId !== fromId) {
           setUnreadCounts((prev) => ({
             ...prev,
@@ -143,7 +152,6 @@ const HealthBot = () => {
         [fromId]: [...(prevChats[fromId] || []), newMessage],
       }));
 
-      // Play notification sound
       playSound(messageAudio);
     },
     [connectionDetails, user, selectedClientId, playSound]
@@ -160,10 +168,20 @@ const HealthBot = () => {
     };
   }, [handleReceiveMessage]);
 
-  // Auto-scroll to bottom when messages change
-  // useEffect(() => {
-  //   scrollToBottom();
-  // }, [chatData, scrollToBottom]);
+  // Auto-scroll effect - Fixed and uncommented
+  useEffect(() => {
+    const currentChatId =
+      user?.Role === "Doctor"
+        ? selectedClientId
+        : connectionDetails.receiverSocketId;
+
+    if (currentChatId && chatData[currentChatId]?.length > 0) {
+      // Use setTimeout to ensure DOM is updated
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [chatData, selectedClientId, connectionDetails.receiverSocketId, user?.Role, scrollToBottom]);
 
   // Message sending logic
   const handleSendMessage = useCallback(() => {
@@ -179,7 +197,6 @@ const HealthBot = () => {
       return;
     }
 
-    // Create message object
     const newMessage = {
       id: Date.now() + Math.random(),
       text: messageInput.trim(),
@@ -189,13 +206,11 @@ const HealthBot = () => {
       senderName: user?.Name || user?.fullName,
     };
 
-    // Add to local chat data
     setChatData((prevChats) => ({
       ...prevChats,
       [targetReceiverId]: [...(prevChats[targetReceiverId] || []), newMessage],
     }));
 
-    // Send via socket
     const messageData = {
       toId: targetReceiverId,
       message: messageInput.trim(),
@@ -205,19 +220,14 @@ const HealthBot = () => {
 
     socket.emit("send-message", messageData);
 
-    // Clear input and play sound
     setMessageInput("");
     playSound(sendAudio);
   }, [messageInput, user, selectedClientId, connectionDetails, playSound]);
-
-
-
 
   // Handle client selection (for doctors)
   const handleClientSelect = useCallback((client) => {
     setSelectedClientId(client.socketId);
 
-    // Clear unread count for selected client
     setUnreadCounts((prev) => ({
       ...prev,
       [client.socketId]: 0,
@@ -237,26 +247,27 @@ const HealthBot = () => {
   const handleLogout = () => {
     localStorage.removeItem("auth");
     localStorage.removeItem("assignedDoctor");
-    // Add your logout logic here
   };
 
   const commonProps = {
-    user,
-    specialist,
-    connectionDetails,
-    selectedClientId,
-    setSelectedClientId,
-    clientList,
-    unreadCounts,
-    messageInput,
-    setMessageInput,
-    handleSendMessage,
-    handleClientSelect,
-    getCurrentMessages,
-    handleLogout,
-    messagesEndRef,
-  };
-  socket.on("peer-disconnected", () => {    
+  user,
+  specialist,
+  connectionDetails,
+  selectedClientId,
+  setSelectedClientId,
+  clientList,
+  unreadCounts,
+  messageInput,
+  setMessageInput,
+  handleSendMessage,
+  handleClientSelect,
+  getCurrentMessages,
+  handleLogout,
+  messagesEndRef,
+  chatData,
+};
+
+  socket.on("peer-disconnected", () => {
     setPeerDisconnected(true);
   });
 
@@ -275,21 +286,17 @@ const HealthBot = () => {
   if (peerDisconnnected) {
     return (
       <PeerDisconnectedPopup
-      isOpen={peerDisconnnected} // <- your existing state (consider renaming)
-      setPeerDisconnected={setPeerDisconnected}
-      peerName={connectionDetails.receiverName}
-    />
-    )
+        isOpen={peerDisconnnected}
+        setPeerDisconnected={setPeerDisconnected}
+        peerName={connectionDetails.receiverName}
+      />
+    );
   }
 
-
-  
   return (
     <div>
-      <div className="hidden  lg:flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
-        {/* Profile Box */}
+      <div className="hidden lg:flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
         <ProfileSidebar user={user} handleLogout={handleLogout} />
-        {/* Main Chat Container */}
 
         <div
           className={`container mx-auto px-4 py-8 ${
@@ -300,10 +307,10 @@ const HealthBot = () => {
             <Loading />
           ) : (
             <div>
-              <div className="flex  mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="flex mx-auto bg-white rounded-lg shadow-md overflow-hidden">
                 {/* Sidebar for Doctor Chats */}
                 {user?.Role == "Doctor" ? (
-                  <div className="w-2/4 border-r border-gray-200 p-4 ">
+                  <div className="w-2/4 border-r border-gray-200 p-4">
                     <div className="flex items-center justify-between">
                       <h3 className="font-bold text-left mb-4 text-gray-600">
                         Chats
@@ -317,12 +324,12 @@ const HealthBot = () => {
                       <div
                         onClick={() => handleClientSelect(client)}
                         key={index}
-                        className={` ${
+                        className={`${
                           selectedClientId === client.socketId
                             ? "bg-[#64F9FA]"
                             : "bg-white"
                         } p-3 rounded-lg mb-2 shadow-md border border-gray-200 cursor-pointer
-              transition duration-300 ease-in-out hover:bg-[#64F9FA] flex justify-between items-center`}
+                        transition duration-300 ease-in-out hover:bg-[#64F9FA] flex justify-between items-center`}
                       >
                         <div>
                           <p className="font-semibold">{client.clientName}</p>
@@ -382,7 +389,12 @@ const HealthBot = () => {
                       <HiDotsVertical size={25} className="text-black" />
                     </button>
                   </div>
-                  <div className="h-96 overflow-y-auto p-6">
+
+                  {/* Fixed scroll container with proper ref */}
+                  <div 
+                    className="h-96 overflow-y-auto p-6 custom-scrollbar" 
+                    ref={scrollContainerRef}
+                  >
                     {getCurrentMessages().map((message, index) => (
                       <div
                         key={index}
@@ -414,8 +426,10 @@ const HealthBot = () => {
                         </div>
                       </div>
                     ))}
+                    {/* Keep this div for fallback scrolling */}
                     <div ref={messagesEndRef} />
                   </div>
+
                   <div className="border-t p-4">
                     <div className="flex items-center">
                       <input
