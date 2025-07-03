@@ -37,7 +37,7 @@ const SelectSpecialist = () => {
 
   const handleClick = (specialist) => {
     setLoading(true);
-    setSpecialist(specialist);
+    // setSpecialist(specialist);
     setSelectedSpecialist(specialist);
     socket.emit("specialization", {
       specialization: specialist,
@@ -53,6 +53,8 @@ const SelectSpecialist = () => {
       />
     );
   }
+
+  
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0] py-8 px-4">
       <div className="max-w-7xl mx-auto">

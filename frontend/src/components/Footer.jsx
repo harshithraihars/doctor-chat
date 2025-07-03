@@ -21,7 +21,7 @@ const Footer = () => {
           </div>
           <div className="w-full md:w-1/4 mb-6 md:mb-0">
             <h5 className="text-xl font-bold mb-4">Contact Us</h5>
-            <p className="text-gray-400">Email: 22a48.glen@sjec.ac.in</p>
+            <p className="text-gray-400">Email: 22a52.hasrhith@sjec.ac.in</p>
             <p className="text-gray-400">Phone:+91 9972487827 </p>
           </div>
           <div className="w-full md:w-1/4">

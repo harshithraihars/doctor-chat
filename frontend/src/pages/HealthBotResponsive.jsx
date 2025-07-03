@@ -56,7 +56,7 @@ const HealthBotMobileTablet = ({
 
   // Unified Layout for Mobile
   return (
-  <div className="flex flex-col h-[600px] bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0] px-2 py-4">
+  <div className="flex flex-col h-[700px] bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0] px-2 py-4">
     {/* Header - Only show for chat list view */}
     {showChatList && (
       <div className="bg-[#64f9fa] px-4 py-3 flex justify-between items-center shadow-md rounded-t-lg">

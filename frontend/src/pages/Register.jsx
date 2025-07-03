@@ -94,10 +94,10 @@ export default function RegisterPage() {
                 height="200"
               />
               <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Welcome Doctor!
+                Welcome Back!
               </h1>
               <p className="text-gray-600">
-                Sign in to your professional dashboard
+                Get Started with your professional dashboard
               </p>
             </div>
             {/* Register Card */}

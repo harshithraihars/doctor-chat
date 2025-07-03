@@ -13,6 +13,7 @@ import {
   Bell,
   Settings,
   Stethoscope,
+  User,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -24,6 +25,7 @@ const Navbar = () => {
   // console.log(localStorage.getItem());
   
   const handleLogout = () => {
+    localStorage.removeItem("assignedDoctor");
     logout();
     navigate("/");
   };
@@ -37,8 +39,6 @@ const Navbar = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  console.log(user);
   
   return (
     <nav className="bg-[#B2EBF2] shadow-2xl backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
@@ -278,7 +278,7 @@ const Navbar = () => {
                 className="flex items-center px-4 py-3 text-white hover:bg-white/20 rounded-lg transition-all duration-300"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <Heart className="h-5 w-5 mr-3" />
+                <User className="h-5 w-5 mr-3" />
                 <span>Register</span>
               </Link>
             </div>

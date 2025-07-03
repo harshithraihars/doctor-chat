@@ -3,8 +3,8 @@ const Doctor = require("../models/Doctor");
 const userSocketMap = new Map(); // userId → socketId
 const socketUserMap = new Map(); // socketId → { id, role, name }
 const doctorClientMap = new Map(); // doctorId → Set of userIds
-// const specializationMap = new Map();
 const availabeSpecializiation = new Set();
+const peerMap = new Map();
 module.exports = (io) => {
   io.on("connection", (socket) => {
     socket.on("Client-login", ({ id, role, name }) => {
@@ -14,7 +14,7 @@ module.exports = (io) => {
       console.log(` ${role} connected: ${name} (${id})`);
 
       setTimeout(() => {
-        socket.emit("available-doctors",[...availabeSpecializiation]);
+        socket.emit("available-doctors", [...availabeSpecializiation]);
       }, 100);
     });
 
@@ -36,10 +36,6 @@ module.exports = (io) => {
 
     // When a user requests a doctor of a specific specialization
     socket.on("specialization", ({ specialization, userId }) => {
-
-      console.log(specialization);
-      console.log(socketUserMap);
-      
       const availableDoctors = [];
 
       for (const [sockId, user] of socketUserMap.entries()) {
@@ -67,9 +63,6 @@ module.exports = (io) => {
       }
       doctorClientMap.get(selected.user.id).add(userId);
 
-      
-      
-      
       socket.emit("doctor-id", {
         role: specialization,
         name: selected.user.name,
@@ -78,7 +71,11 @@ module.exports = (io) => {
     });
 
     socket.on("send-message", ({ toId, message, fromId, senderName }) => {
-      console.log(toId, message, fromId, senderName);
+      // set up peerconnection who is connected to who helps in disconnection
+      if (!peerMap.has(fromId)) peerMap.set(fromId, new Set());
+      if (!peerMap.has(toId)) peerMap.set(toId, new Set());
+      peerMap.get(fromId).add(toId);
+      peerMap.get(toId).add(fromId);
 
       const toSocketId = userSocketMap.get(toId);
       if (toId) {
@@ -118,6 +115,31 @@ module.exports = (io) => {
       }
 
       console.log(" Disconnected:", socket.id);
+
+      console.log(peerMap);
+
+      // send the peer disconnected message to all th other peers connected to it
+      const peersConnected = peerMap.get(socket.id);
+      if (peersConnected) {
+        for (const peerSocketId of peersConnected) {
+          const peerSocket = io.sockets.sockets.get(peerSocketId);
+          if (peerSocket) {
+            console.log("peer found");
+            peerSocket.emit("peer-disconnected", {
+              peerId: socket.id,
+            });
+          }
+
+          // remove the peersocket from map because the connection is added in the map two times
+          const peerSet = peerMap.get(peerSocketId);
+          if (peerSet) {
+            peerSet.delete(socket.id);
+          }
+        }
+
+        peerMap.delete(socket.id);
+      }
+
     });
   });
 };

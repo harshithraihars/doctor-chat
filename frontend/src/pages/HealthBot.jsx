@@ -14,6 +14,7 @@ import ProfileSidebar from "../components/ProfileSideBar";
 import Loading from "./Loading";
 import SelectSpecialist from "./SelectSpecialist";
 import HealthBotMobileTablet from "./HealthBotResponsive";
+import PeerDisconnectedPopup from "./peerDisconnectPopup";
 
 const HealthBot = () => {
   // Audio instances
@@ -21,7 +22,7 @@ const HealthBot = () => {
   const messageAudio = new Audio(messageSound);
 
   // Auth context
-  const { user, setUser, specialist, chatData, setChatData } = useAuth();
+  const { user, setUser, specialist, chatData, setChatData,setSpecialist } = useAuth();
 
   // State management
   const [connectionDetails, setConnectionDetails] = useState({
@@ -35,7 +36,7 @@ const HealthBot = () => {
   const [unreadCounts, setUnreadCounts] = useState({}); // Unread message counts
   const [messageInput, setMessageInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
+  const [peerDisconnnected, setPeerDisconnected] = useState(false);
   // Refs
   const messagesEndRef = useRef(null);
 
@@ -64,6 +65,7 @@ const HealthBot = () => {
           receiverName: assignedDoctor.name,
           role: assignedDoctor.role,
         });
+        setSpecialist(assignedDoctor.role)
       }
 
       setIsLoading(false);
@@ -235,18 +237,6 @@ const HealthBot = () => {
     // Add your logout logic here
   };
 
-  if (user.Role == "Client" && !specialist) {
-    return <SelectSpecialist />;
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader color="#36d7b7" size={50} />
-      </div>
-    );
-  }
-
   const commonProps = {
     user,
     specialist,
@@ -263,7 +253,35 @@ const HealthBot = () => {
     handleLogout,
     messagesEndRef,
   };
+  socket.on("peer-disconnected", () => {    
+    setPeerDisconnected(true);
+  });
 
+  if (user.Role == "Client" && !specialist) {
+    return <SelectSpecialist />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader color="#36d7b7" size={50} />
+      </div>
+    );
+  }
+
+  if (peerDisconnnected) {
+    return (
+      <PeerDisconnectedPopup
+      isOpen={peerDisconnnected} // <- your existing state (consider renaming)
+      setPeerDisconnected={setPeerDisconnected}
+      peerName={connectionDetails.receiverName}
+    />
+    )
+  }
+
+
+  console.log(specialist);
+  
   return (
     <div>
       <div className="hidden  lg:flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
