@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 
 import AppRoutes from "./routes/AppRoutes";
 import { useSocketInit } from "./Socket/useSocketInit";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   useSocketInit();
@@ -20,6 +21,7 @@ function App() {
           <Footer />
         </div>
       </Router>
+      <Toaster position="top-center" reverseOrder={false}/>
     </AuthProvider>
   );
 }

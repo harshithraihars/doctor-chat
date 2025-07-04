@@ -16,7 +16,10 @@ import {
   User,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-
+import toast from "react-hot-toast";
+import Avatar from "@mui/material/Avatar";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/firebase.config";
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout, doctor, setDoctor } = useAuth();
@@ -28,6 +31,8 @@ const Navbar = () => {
     localStorage.removeItem("assignedDoctor");
     logout();
     navigate("/");
+    signOut(auth)
+    toast.success("Logged out successfully")
   };
 
   const handleDoctorLogout = () => {
@@ -98,7 +103,12 @@ const Navbar = () => {
                 {/* User Profile */}
                 <div className="flex items-center space-x-3 pl-4 border-l border-gray-400">
                   <div className="flex items-center space-x-2">
-                    <UserCircle className="h-8 w-8 text-gray-600" />
+                    <Avatar
+                          src="https://tse3.mm.bing.net/th?id=OIP.btgP01toqugcXjPwAF-k2AHaHa&pid=Api&P=0&h=180"
+                          size="40"
+                          round={true}
+                          className="w-full h-full object-cover"
+                        />
                     <div className="text-left">
                       <div className="text-gray-800 text-sm font-medium">
                         Welcome back!
@@ -159,14 +169,6 @@ const Navbar = () => {
                     <UserCircle className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
                     <span className="font-medium">Login</span>
                   </Link>
-
-                  {/* <Link
-                    to="/register"
-                    className="flex items-center px-4 py-2 bg-gray-800 text-white hover:bg-gray-700 rounded-lg transition-all duration-300 font-medium group"
-                  >
-                    <Heart className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-                    <span>Get Started</span>
-                  </Link> */}
                 </div>
               </>
             )}

@@ -10,6 +10,7 @@ import { googleSignUp } from "../firebase/AuthFunction";
 import { socket } from "../Socket/Socket";
 import { setupSocket } from "../Socket/useSocketInit";
 import { ClipLoader } from "react-spinners";
+import toast from "react-hot-toast";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -65,9 +66,11 @@ const Login = () => {
 
       setUpUser(user);
       localStorage.setItem("token", token);
+      toast.success("Logged in Successfully")
     } catch (error) {
       const serverMsg = error.response?.data?.message;
       setError(serverMsg || "Invalid email or password. Please try again.");
+      toast.error(error.message)
     } finally {
       setIsLoading(false);
     }
@@ -325,10 +328,11 @@ const Login = () => {
                 {/* Google Sign In Button - Now properly aligned within the main form area */}
                 <button
                   onClick={handleGoogleSignUp}
+                  disabled={googleSignupLoading}
                   className={`w-full  bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300 py-2.5 px-4 rounded-xl transition-all duration-300 hover:border-gray-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-200 font-medium`}
                 >
                   {googleSignupLoading ? (
-                    <div className="flex gap-3 items-center justify-center">
+                    <div className="cursor-not-allowed flex gap-3 items-center justify-center">
                       <ClipLoader size={15}/>
                       <span className="text-gray-400">Loading...</span>
                     </div>

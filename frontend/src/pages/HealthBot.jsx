@@ -21,8 +21,13 @@ import Loading from "./Loading";
 import SelectSpecialist from "./SelectSpecialist";
 import HealthBotMobileTablet from "./HealthBotResponsive";
 import PeerDisconnectedPopup from "./peerDisconnectPopup";
+import { useLocation, useMatch } from "react-router-dom";
 
 const HealthBot = () => {
+  const {pathname}=useLocation()
+  const currentPage = pathname.slice(1);
+  
+
   // Audio instances
   const sendAudio = new Audio(sendSound);
   const messageAudio = new Audio(messageSound);
@@ -152,6 +157,12 @@ const HealthBot = () => {
         [fromId]: [...(prevChats[fromId] || []), newMessage],
       }));
 
+
+      console.log(currentPage);
+      
+      // if(currentPage!="health-bot"){
+      //   toast.success(`${connectionDetails.receiverName}:${message}`)
+      // }
       playSound(messageAudio);
     },
     [connectionDetails, user, selectedClientId, playSound]

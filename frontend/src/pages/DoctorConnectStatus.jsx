@@ -1,38 +1,57 @@
 import { X, Clock } from "lucide-react";
-import { useEffect, useState } from "react";
-
-const SpecialistUnavailable = ({ specialistName, onClose }) => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
+const DoctorConnectStatus = ({
+  specialistName,
+  onClose,
+  isFindingDoctor,
+  showUnavailable,
+}) => {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      {isLoading ? (
-        <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-sm w-full text-center flex flex-col items-center gap-6 border border-gray-100 relative animate-fade-in">
-          {/* Decorative glow */}
-          <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-cyan-100 via-blue-100 to-transparent rounded-full blur-2xl opacity-50 -z-10 -translate-x-1/2 -translate-y-1/2"></div>
+      {isFindingDoctor && (
+        <div className="bg-white rounded-3xl px-10 py-12 shadow-2xl max-w-sm w-full text-center flex flex-col items-center gap-6 border border-gray-100 relative overflow-hidden animate-fade-in">
+          {/* Blurred Glow */}
+          <div className="absolute top-[-80px] left-1/2 transform -translate-x-1/2 w-72 h-72 bg-gradient-to-br from-cyan-300/40 via-teal-200/30 to-transparent rounded-full blur-3xl z-0" />
 
-          {/* Icon */}
-          <div className="w-20 h-20 bg-gradient-to-br from-[#5CF7F8] to-[#3BE8E9] rounded-full flex items-center justify-center shadow-lg ring-4 ring-white">
-            <Clock className="w-10 h-10 text-white drop-shadow-md" />
+          {/* Animated Icon */}
+          <div className="relative z-10 animate-spin-slow">
+            <div className="w-20 h-20 bg-gradient-to-br from-[#5CF7F8] to-[#3BE8E9] rounded-full flex items-center justify-center shadow-xl ring-4 ring-white">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-10 h-10 text-white drop-shadow-lg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M4 4v6h6M20 20v-6h-6" />
+                <path d="M4 10a9 9 0 0114.6-5.6L20 4M20 14a9 9 0 01-14.6 5.6L4 20" />
+              </svg>
+            </div>
           </div>
 
-          {/* Text + Dot animation */}
-          <div>
-            <h3 className="text-xl font-semibold text-gray-800 flex items-center justify-center gap-1">
-              Checking for availability
-              <span className="dot-typing ml-1" />
+          {/* Status Text with dots */}
+          <div className="relative z-10">
+            <h3 className="text-2xl font-bold text-gray-800 mb-2 tracking-tight">
+              Finding Your Doctor
             </h3>
+            <p className="text-sm text-gray-600">
+              Matching you with an available specialist
+            </p>
+            <div className="mt-4 flex justify-center">
+              <span className="dot-typing" />
+            </div>
+          </div>
+
+          {/* Animated slide bar */}
+          <div className="absolute bottom-0 left-0 w-full h-1 overflow-hidden pointer-events-none">
+            <div className="w-full h-full bg-gradient-to-r from-[#5CF7F8] via-teal-400 to-[#3BE8E9] animate-slide" />
           </div>
         </div>
-      ) : (
+      )}
+      {showUnavailable && (
         <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full relative border border-gray-100">
           {/* Background decoration */}
-          
+
           {/* Close Button */}
           <button
             onClick={onClose}
@@ -85,4 +104,4 @@ const SpecialistUnavailable = ({ specialistName, onClose }) => {
   );
 };
 
-export default SpecialistUnavailable;
+export default DoctorConnectStatus;

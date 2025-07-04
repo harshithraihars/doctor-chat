@@ -1,13 +1,56 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-::-webkit-scrollbar{
-    display: none;
+
+/* Hide scrollbars globally */
+::-webkit-scrollbar {
+  display: none;
 }
-/* .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+
+@layer utilities {
+  /* Dot Typing Animation */
+  .dot-typing::after {
+    content: '';
+    display: inline-block;
+    animation: dots 1.2s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+    100% { content: ''; }
+  }
+
+  /* Slide Animation (used for bottom loader bar) */
+  .animate-slide {
+    animation: slide 1.5s ease-in-out infinite;
+    will-change: transform;
+    transform: translateX(-100%);
+  }
+
+  @keyframes slide {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Slow Spin (used for loader icon) */
+  .animate-spin-slow {
+    animation: spin 2s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes spin {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-} */

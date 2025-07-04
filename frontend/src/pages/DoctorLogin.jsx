@@ -32,7 +32,7 @@ const DoctorLogin = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/doctor/login", // Backend API endpoint
+        "https://doctor-chat-8184.onrender.com/api/doctor/login", // Backend API endpoint
         {
           docId: data.doctorId,
           password: data.password,
@@ -54,11 +54,12 @@ const DoctorLogin = () => {
       setupSocket({ Id: data.doctorId });
       localStorage.setItem("token", token);
       setDoctorId(data.doctorId);
-
+      toast.success("Logged in Successfully");
       navigate("/health-bot");
     } catch (error) {
       console.error("Login error:", error);
       setError("Invalid Doctor ID or password. Please try again.");
+      toast
     } finally {
       setIsLoading(false);
     }
