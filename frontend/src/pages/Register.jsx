@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import LeftSideBar from "../components/LeftSideBar";
 import axios from "axios";
-
+import loginImg from "../assets/images/login.png"
 // Mock Link component for demonstration
 const Link = ({ to, children, className }) => (
   <a href={to} className={className}>
@@ -88,7 +88,7 @@ export default function RegisterPage() {
             <div className="lg:hidden text-center mb-8">
               <img
                 className="mx-auto mb-4 drop-shadow-lg"
-                src="src/assets/images/login.png"
+                src={loginImg}
                 alt="Healthcare Professional"
                 width="200"
                 height="200"

@@ -7,7 +7,8 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import LeftSideBar from "../components/LeftSideBar";
 import { setupSocket } from "../Socket/useSocketInit";
-
+import toast from "react-hot-toast";
+import loginImg from "../assets/images/login.png"
 const schema = yup.object().shape({
   doctorId: yup.string().required("Doctor ID is required"),
   password: yup.string().required("Password is required"),
@@ -55,7 +56,7 @@ const DoctorLogin = () => {
       localStorage.setItem("token", token);
       setDoctorId(data.doctorId);
       toast.success("Logged in Successfully");
-      navigate("/health-bot");
+      navigate("/");
     } catch (error) {
       console.error("Login error:", error);
       setError("Invalid Doctor ID or password. Please try again.");
@@ -103,7 +104,7 @@ const DoctorLogin = () => {
             <div className="lg:hidden text-center mb-8">
               <img
                 className="mx-auto mb-4 drop-shadow-lg"
-                src="src/assets/images/login.png"
+                src={loginImg}
                 alt="Healthcare Professional"
                 width="200"
                 height="200"

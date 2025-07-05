@@ -13,7 +13,7 @@ const ProfileSidebar = ({ user, handleLogout }) => {
         hidden md:flex w-4/5 lg:w-1/5 h-[500px] mt-10 mx-auto lg:ml-20
         flex-col items-center rounded-3xl 
         bg-gradient-to-br from-cyan-300 via-teal-200 to-emerald-200 
-        shadow-xl border border-white/30 relative overflow-hidden
+        shadow-xl border border-white/30 relative overflow-hidden mb-10
       "
     >
       {/* Decorative glow */}

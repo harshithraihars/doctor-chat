@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LeftSideBar from "../components/LeftSideBar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import loginImg from "../assets/images/login.png"
 const ForgotPassword = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -137,7 +137,7 @@ const ForgotPassword = () => {
             <div className="lg:hidden text-center mb-6">
               <img
                 className="mx-auto mb-4 drop-shadow-lg"
-                src="src/assets/images/login.png"
+                src={loginImg}
                 alt="Healthcare"
                 width="200"
                 height="200"

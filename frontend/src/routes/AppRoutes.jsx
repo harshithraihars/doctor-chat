@@ -4,10 +4,10 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
 import DoctorLogin from "../pages/DoctorLogin";
-import DoctorRegister from "../pages/Doctorregister";
 import SelectSpecialist from "../pages/SelectSpecialist";
 import HealthBot from "../pages/HealthBot";
 import PrivateRoute from "../components/PrivateRoute";
+import DoctorRegister from "../pages/DoctorRegister";
 
 export default function AppRoutes() {
   return (
@@ -28,7 +28,7 @@ export default function AppRoutes() {
       />
 
       <Route
-        path="/health-bot"
+        path="/chat"
         element={
           <PrivateRoute>
             <HealthBot />

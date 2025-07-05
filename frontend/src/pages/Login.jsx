@@ -7,11 +7,11 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import LeftSideBar from "../components/LeftSideBar";
 import { googleSignUp } from "../firebase/AuthFunction";
-import { socket } from "../Socket/Socket";
 import { setupSocket } from "../Socket/useSocketInit";
 import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
-
+import loginImg from "../assets/images/login.png"
+import googleImg from "../assets/images/google.png"
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("Password is required"),
@@ -122,7 +122,7 @@ const Login = () => {
             <div className="lg:hidden text-center mb-8">
               <img
                 className="mx-auto mb-4 drop-shadow-lg"
-                src="src/assets/images/login.png"
+                src={loginImg}
                 alt="Healthcare Professional"
                 width="200"
                 height="200"
@@ -338,7 +338,7 @@ const Login = () => {
                     </div>
                   ):(<div className="flex items-center justify-center gap-3">
                     <img
-                    src="src/assets/images/google.png"
+                    src={googleImg}
                     alt="Google Logo"
                     className="w-5 h-5"
                   />

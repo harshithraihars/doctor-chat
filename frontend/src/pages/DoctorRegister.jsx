@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
 import LeftSideBar from "../components/LeftSideBar";
-
+import loginImg from "../assets/images/login.png"
 const schema = yup.object().shape({
   fullName: yup.string().required("Full name is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -92,7 +92,7 @@ const DoctorRegister = () => {
             <div className="lg:hidden text-center mb-8">
               <img
                 className="mx-auto mb-4 drop-shadow-lg"
-                src="src/assets/images/login.png"
+                src={loginImg}
                 alt="Healthcare Professional"
                 width="200"
                 height="200"

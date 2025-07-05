@@ -25,7 +25,7 @@ const SelectSpecialist = () => {
       localStorage.setItem("assignedDoctor", JSON.stringify(assigned));
 
       setisFindingDoctor(false);
-      navigate("/health-bot");
+      navigate("/chat");
     };
 
     socket.on("doctor-id", handleDoctorAssigned);

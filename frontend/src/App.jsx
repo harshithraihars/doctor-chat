@@ -12,7 +12,7 @@ function App() {
   useSocketInit();
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/doctor-chat">
         <div className="flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-grow">

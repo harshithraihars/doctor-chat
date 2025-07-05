@@ -20,19 +20,20 @@ import toast from "react-hot-toast";
 import Avatar from "@mui/material/Avatar";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
+import logo from "../assets/images/logo.png"
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout, doctor, setDoctor } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const Role=JSON.parse(localStorage.getItem("auth"))?.Role
+  const Role = JSON.parse(localStorage.getItem("auth"))?.Role;
   // console.log(localStorage.getItem());
-  
+
   const handleLogout = () => {
     localStorage.removeItem("assignedDoctor");
     logout();
     navigate("/");
-    signOut(auth)
-    toast.success("Logged out successfully")
+    signOut(auth);
+    toast.success("Logged out successfully");
   };
 
   const handleDoctorLogout = () => {
@@ -44,7 +45,7 @@ const Navbar = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  
+
   return (
     <nav className="bg-[#B2EBF2] shadow-2xl backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,7 +56,7 @@ const Navbar = () => {
               <div className="relative">
                 <img
                   className="bg-transparent w-16 h-16"
-                  src="src/assets/images/logo.png"
+                  src={logo}
                   alt="Healthcare"
                 />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -73,7 +74,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {Role=="Client" ? (
+            {Role? (
               // Patient Navigation
               <>
                 <Link
@@ -85,40 +86,55 @@ const Navbar = () => {
                 </Link>
 
                 <Link
-                  to="/health-bot"
+                  to="/chat"
                   className="flex items-center px-4 py-2 text-gray-800 hover:bg-cyan-200/50 rounded-lg transition-all duration-300 group"
                 >
                   <Bot className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-                  <span className="font-medium">Health Bot</span>
+                  <span className="font-medium">Health chat</span>
                 </Link>
-
-                {/* Notifications */}
-                {/* <button className="relative p-2 text-gray-800 hover:bg-cyan-200/50 rounded-lg transition-all duration-300">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    3
-                  </span>
-                </button> */}
 
                 {/* User Profile */}
                 <div className="flex items-center space-x-3 pl-4 border-l border-gray-400">
-                  <div className="flex items-center space-x-2">
-                    <Avatar
+                  {Role == "Client" ? (
+                    <div className="flex items-center space-x-2">
+                      <Avatar
+                        src="https://tse3.mm.bing.net/th?id=OIP.btgP01toqugcXjPwAF-k2AHaHa&pid=Api&P=0&h=180"
+                        size="40"
+                        round={true}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="text-left">
+                        <div className="text-gray-800 text-sm font-medium">
+                          Welcome back!
+                        </div>
+                        <div className="text-gray-600 text-sm font-bold">
+                          {user?.Name}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center space-x-3 px-4 py-2 bg-gray-800/10 rounded-lg">
+                        <Avatar
                           src="https://tse3.mm.bing.net/th?id=OIP.btgP01toqugcXjPwAF-k2AHaHa&pid=Api&P=0&h=180"
                           size="40"
                           round={true}
                           className="w-full h-full object-cover"
                         />
-                    <div className="text-left">
-                      <div className="text-gray-800 text-sm font-medium">
-                        Welcome back!
+                        <div className="text-left">
+                          <div className="text-gray-800 text-xl font-medium">
+                            {user?.Name}
+                          </div>
+                          <div className="text-green-600 text-xs">
+                            Medical Professional
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-gray-600 text-sm font-bold">{user?.Name}</div>
                     </div>
-                  </div>
+                  )}
 
                   <button
-                    onClick={handleLogout}
+                    onClick={Role=="Client"?()=>handleLogout():()=>handleDoctorLogout()}
                     className="flex items-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-300 group"
                   >
                     <LogOut className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
@@ -126,34 +142,7 @@ const Navbar = () => {
                   </button>
                 </div>
               </>
-            ) : Role=="Doctor" ? (
-              // Doctor Navigation
-              <>
-                <div className="flex items-center space-x-3 px-4 py-2 bg-gray-800/10 rounded-lg">
-                  <Stethoscope className="h-6 w-6 text-green-600" />
-                  <div className="text-left">
-                    <div className="text-gray-800 text-xl font-medium">
-                      {user?.Name}
-                    </div>
-                    <div className="text-green-600 text-xs">
-                      Medical Professional
-                    </div>
-                  </div>
-                </div>
-
-                <button className="relative p-2 text-gray-800 hover:bg-cyan-200/50 rounded-lg transition-all duration-300">
-                  <Activity className="h-5 w-5" />
-                </button>
-
-                <button
-                  onClick={handleDoctorLogout}
-                  className="flex items-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-300 group"
-                >
-                  <LogOut className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm font-medium">Logout</span>
-                </button>
-              </>
-            ) : (
+            ): (
               // Guest Navigation
               <>
                 <div className="flex items-center space-x-4">
@@ -220,12 +209,12 @@ const Navbar = () => {
               </Link>
 
               <Link
-                to="/health-bot"
+                to="/chat"
                 className="flex items-center px-4 py-3 text-white hover:bg-white/20 rounded-lg transition-all duration-300 mb-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Bot className="h-5 w-5 mr-3" />
-                <span>Health Bot</span>
+                <span>Health chat</span>
               </Link>
 
               <button
@@ -246,9 +235,7 @@ const Navbar = () => {
                 <Stethoscope className="h-8 w-8 text-green-400" />
                 <div>
                   <div className="text-white font-medium">Doctor Portal</div>
-                  <div className="text-green-200 text-sm">
-                    
-                  </div>
+                  <div className="text-green-200 text-sm"></div>
                 </div>
               </div>
 
