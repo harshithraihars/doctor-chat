@@ -8,10 +8,10 @@ const app = express();
 const http = require("http").createServer(app);
 require("dotenv").config({});
 
-const allowedOrigins=[process.env.CLIENT_URL,"http://localhost:5173"]
+const allowedOrigins=[process.env.CORS_ORIGIN,"http://localhost:5173"]
 const io = require("socket.io")(http, {
   cors: {
-    origin: allowedOrigins,
+    origin: [process.env.CLIENT_URL,"http://localhost:5173"],
     methods: ["GET", "POST"],
     credentials: true,
   },
