@@ -1,0 +1,1 @@
+import{a,j as t,N as i}from"./index-Cysv3JTe.js";const o=({children:r})=>{const{user:s,isAuthLoading:e}=a();return e?t.jsx("div",{children:"Loading..."}):s?t.jsx(t.Fragment,{children:r}):t.jsx(i,{to:"/login"})};export{o as default};
