@@ -1,0 +1,1 @@
+.loader span{font-size:38px;font-family:Courier New,Courier,monospace;font-weight:bolder;animation:blur 3s linear infinite;line-height:20px;transition:all .5s;letter-spacing:.2em}@keyframes blur{0%,90%{filter:blur(0)}50%{filter:blur(10px)}}
