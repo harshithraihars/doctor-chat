@@ -37,7 +37,7 @@ const DoctorRegister = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "https://doctor-chat-8184.onrender.com/api/doctor/register",
+        "http://localhost:5000/api/doctor/register",
         {
           name: data.fullName,
           email: data.email,

@@ -10,7 +10,7 @@ import { setupSocket } from "../Socket/useSocketInit";
 import toast from "react-hot-toast";
 import loginImg from "../assets/images/login.png"
 const schema = yup.object().shape({
-  doctorId: yup.string().required("Doctor ID is required"),
+  email: yup.string().required("Doctor ID is required"),
   password: yup.string().required("Password is required"),
 });
 
@@ -32,10 +32,12 @@ const DoctorLogin = () => {
     setError(null);
     setIsLoading(true);
     try {
+      console.log(data.email);
+      
       const response = await axios.post(
-        "https://doctor-chat-8184.onrender.com/api/doctor/login", // Backend API endpoint
+        "http://localhost:5000/api/doctor/login", // Backend API endpoint
         {
-          docId: data.doctorId,
+          email: data.email,
           password: data.password,
         }
       );
@@ -156,7 +158,7 @@ const DoctorLogin = () => {
                   {/* Doctor ID Field */}
                   <div className="space-y-2">
                     <label
-                      htmlFor="doctorId"
+                      htmlFor="email"
                       className="block text-sm font-semibold text-gray-700"
                     >
                       Doctor ID
@@ -179,13 +181,13 @@ const DoctorLogin = () => {
                       </div>
                       <input
                         type="text"
-                        id="doctorId"
-                        {...register("doctorId")}
+                        id="email"
+                        {...register("email")}
                         className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
                         placeholder="Enter your Doctor ID"
                       />
                     </div>
-                    {errors.doctorId && (
+                    {errors.email && (
                       <p className="text-red-500 text-sm flex items-center">
                         <svg
                           className="w-4 h-4 mr-1"
@@ -198,7 +200,7 @@ const DoctorLogin = () => {
                             clipRule="evenodd"
                           />
                         </svg>
-                        {errors.doctorId.message}
+                        {errors.email.message}
                       </p>
                     )}
                   </div>

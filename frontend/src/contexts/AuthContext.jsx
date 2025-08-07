@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        "https://doctor-chat-8184.onrender.com/api/auth/login",
+        "http://localhost:5000/api/user/login",
         {
           email,
           password,
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, fullName) => {
     try {
       const response = await axios.post(
-        "https://doctor-chat-8184.onrender.com/api/auth/register",
+        "http://localhost:5000/api/user/register",
         {
           email,
           password,
