@@ -18,12 +18,12 @@ const registerDoc=async (req, res) => {
 
 const loginDoc = async (req, res) => {
   try {
-    const { docId, password } = req.body;
-    console.log(docId,password);
+    const { email, password } = req.body;    
+    console.log(email,password);
     
-    if (!docId || !password)
+    if (!email || !password)
       return res.status(401).json({ message: "all field are required",success:false  });
-    const doctor = await Doctor.findOne({ docId });
+    const doctor = await Doctor.findOne({ email });
     if (!doctor) return res.status(401).json({ msg: "invalid Id or password",success:false  });
     const ismatch = await bcrypt.compare(password, doctor.password);
     if (!ismatch)

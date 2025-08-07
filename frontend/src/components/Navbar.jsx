@@ -15,12 +15,13 @@ import {
   Stethoscope,
   User,
 } from "lucide-react";
+import { FaUserDoctor } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import Avatar from "@mui/material/Avatar";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
-import logo from "../assets/images/logo.png"
+import logo from "../assets/images/logo.png";
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout, doctor, setDoctor } = useAuth();
@@ -30,9 +31,11 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("assignedDoctor");
+    localStorage.removeItem("token");
     logout();
     navigate("/");
     signOut(auth);
+    localStorage.removeItem("lastActiveChatId")
     toast.success("Logged out successfully");
   };
 
@@ -74,7 +77,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {Role? (
+            {Role ? (
               // Patient Navigation
               <>
                 <Link
@@ -89,10 +92,17 @@ const Navbar = () => {
                   to="/chat"
                   className="flex items-center px-4 py-2 text-gray-800 hover:bg-cyan-200/50 rounded-lg transition-all duration-300 group"
                 >
-                  <Bot className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-                  <span className="font-medium">Health chat</span>
+                  <FaUserDoctor/>
+                  <span className=" ml-2font-medium">Health chat</span>
                 </Link>
 
+                <Link
+                  to="/chatbot"
+                  className="flex items-center px-4 py-2 text-gray-800 hover:bg-cyan-200/50 rounded-lg transition-all duration-300 group"
+                >
+                  <Bot className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+                  <span className="font-medium">HealthBot</span>
+                </Link>
                 {/* User Profile */}
                 <div className="flex items-center space-x-3 pl-4 border-l border-gray-400">
                   {Role == "Client" ? (
@@ -134,7 +144,11 @@ const Navbar = () => {
                   )}
 
                   <button
-                    onClick={Role=="Client"?()=>handleLogout():()=>handleDoctorLogout()}
+                    onClick={
+                      Role == "Client"
+                        ? () => handleLogout()
+                        : () => handleDoctorLogout()
+                    }
                     className="flex items-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-300 group"
                   >
                     <LogOut className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
@@ -142,7 +156,7 @@ const Navbar = () => {
                   </button>
                 </div>
               </>
-            ): (
+            ) : (
               // Guest Navigation
               <>
                 <div className="flex items-center space-x-4">
@@ -213,8 +227,9 @@ const Navbar = () => {
                 className="flex items-center px-4 py-3 text-white hover:bg-white/20 rounded-lg transition-all duration-300 mb-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <Bot className="h-5 w-5 mr-3" />
-                <span>Health chat</span>
+                <doctpor className="h-5 w-5 mr-3" />
+                <FaUserDoctor />
+                <span>HealthBot</span>
               </Link>
 
               <button

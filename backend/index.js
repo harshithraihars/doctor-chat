@@ -1,8 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const authRoutes = require("./routes/auth");
+
+const userRoutes = require("./routes/userRoute");
 const docrouter = require("./routes/docRoute");
+const chatbotRoute = require("./routes/chatbotRoute");
+
 const setUpSocket = require("./Sockets/socket");
 const app = express();
 const http = require("http").createServer(app);
@@ -20,8 +23,9 @@ const io = require("socket.io")(http, {
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/doctor", docrouter);
+app.use("/api/chatbot", chatbotRoute);
 
 mongoose
   .connect(process.env.MONGO_URL)

@@ -10,8 +10,8 @@ import { googleSignUp } from "../firebase/AuthFunction";
 import { setupSocket } from "../Socket/useSocketInit";
 import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
-import loginImg from "../assets/images/login.png"
-import googleImg from "../assets/images/google.png"
+import loginImg from "../assets/images/login.png";
+import googleImg from "../assets/images/google.png";
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("Password is required"),
@@ -66,11 +66,10 @@ const Login = () => {
 
       setUpUser(user);
       localStorage.setItem("token", token);
-      toast.success("Logged in Successfully")
     } catch (error) {
       const serverMsg = error.response?.data?.message;
       setError(serverMsg || "Invalid email or password. Please try again.");
-      toast.error(error.message)
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -79,8 +78,20 @@ const Login = () => {
   const handleGoogleSignUp = async () => {
     try {
       setGoogleSignUpLoading(true);
-      const user = await googleSignUp();
-      setUpUser(user.displayName);
+      const fireBaseuser = await googleSignUp();
+      const fireBasetoken = await fireBaseuser.getIdToken();
+      const response = await axios.post(
+        "http://localhost:5000/api/user/firebase-login",
+        {
+          token:fireBasetoken,
+        }
+      );
+
+      const { token, user } = response.data;
+
+      setUpUser(user);
+      localStorage.setItem("token", token);
+
     } catch (error) {
       setError("Google Sign-Up Failed:");
       console.log(error.message);
@@ -333,17 +344,19 @@ const Login = () => {
                 >
                   {googleSignupLoading ? (
                     <div className="cursor-not-allowed flex gap-3 items-center justify-center">
-                      <ClipLoader size={15}/>
+                      <ClipLoader size={15} />
                       <span className="text-gray-400">Loading...</span>
                     </div>
-                  ):(<div className="flex items-center justify-center gap-3">
-                    <img
-                    src={googleImg}
-                    alt="Google Logo"
-                    className="w-5 h-5"
-                  />
-                  <span className="text-sm">Sign in with Google</span>
-                    </div>)}
+                  ) : (
+                    <div className="flex items-center justify-center gap-3">
+                      <img
+                        src={googleImg}
+                        alt="Google Logo"
+                        className="w-5 h-5"
+                      />
+                      <span className="text-sm">Sign in with Google</span>
+                    </div>
+                  )}
                 </button>
               </div>
 

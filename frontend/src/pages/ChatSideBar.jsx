@@ -7,7 +7,8 @@ const ChatSidebar = ({
   onSelectChat,
   setIsSidebarOpen,
   isHistoryLoading,
-  handlenewChat
+  handlenewChat,
+  activeChat
 }) => {
   return (
     <div className="h-full w-full bg-gradient-to-b from-cyan-300 via-cyan-100 to-white shadow-xl border-r border-cyan-100 flex flex-col relative pt-6 px-4">
@@ -54,8 +55,10 @@ const ChatSidebar = ({
             <div
               key={chat.id}
               onClick={() => onSelectChat(chat)}
-              className="flex items-center gap-3 px-4 py-2 rounded-md bg-white/40 hover:bg-[#4ed1ef] text-gray-800 font-medium cursor-pointer transition-all truncate shadow-sm"
-            >
+              className={`${
+  activeChat.id === chat.id ? "bg-[#4ed1ef]" : ""
+} flex items-center gap-3 px-4 py-2 rounded-md bg-white/40 hover:bg-[#4ed1ef] text-gray-800 font-medium cursor-pointer transition-all truncate shadow-sm`}
+>
               <LuMessageSquareText size={18} />
               <span className="truncate">{chat.name}</span>
             </div>

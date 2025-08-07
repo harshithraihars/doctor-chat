@@ -1,5 +1,5 @@
 // src/hooks/useChatbotAPI.js
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const useChat = () => {
   const token = localStorage.getItem("token");
@@ -15,34 +15,40 @@ const useChat = () => {
 
   const fetchChatHistory = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/chatbot/history", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setChatList(
-        data.map((chat) => ({
-          id: chat.conversationId,
-          name: chat.title || "Untitled Chat",
-          updatedAt: chat.updatedAt,
-          messages: [],
-        }))
-      );
-      setActiveChat({ id: null, title: "Untitled Chat" });
-      setMessages([]);
-    } catch (err) {
-      console.error("History fetch failed", err);
-    } finally {
-      setIsHistoryLoading(false);
+    const res = await fetch("http://localhost:5000/api/chatbot/history", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    const chatList = data.map((chat) => ({
+      id: chat.conversationId,
+      name: chat.title || "Untitled Chat",
+      updatedAt: chat.updatedAt,
+      messages: [],
+    }));
+    setChatList(chatList);
+
+    const lastChatId = localStorage.getItem("lastActiveChatId");
+    if (lastChatId) {
+      const foundChat = chatList.find((chat) => chat.id === lastChatId);
+      if (foundChat) {
+        await handleChatSelect(foundChat);
+      }
     }
+  } catch (err) {
+    console.error("History fetch failed", err);
+  } finally {
+    setIsHistoryLoading(false);
+  }
   }, [token]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
-
+    const message=inputMessage;
+    setInputMessage("")
     const userMessage = {
       sender: "user",
-      content: inputMessage,
+      content: message,
       file: selectedFile,
       timestamp: new Date().toISOString(),
     };
@@ -58,7 +64,7 @@ const useChat = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          message: inputMessage,
+          message: message,
           conversationId: activeChat?.id || null,
         }),
       });
@@ -75,7 +81,7 @@ const useChat = () => {
       if (!activeChat?.id && data.conversationId) {
         const newChat = {
           id: data.conversationId,
-          name: "Untitled Chat",
+          name: data.title || "Untitled Chat",
           updatedAt: new Date().toISOString(),
         };
         setActiveChat(newChat);
@@ -120,6 +126,11 @@ const useChat = () => {
   const setSelectedFileExternally = (file) => {
     setSelectedFile(file);
   };
+useEffect(() => {
+  if (activeChat?.id) {
+    localStorage.setItem("lastActiveChatId", activeChat.id);
+  }
+}, [activeChat]);
 
   return {
     messages,

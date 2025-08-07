@@ -1,5 +1,5 @@
 // src/pages/HealthBotPage.jsx
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import MainChatArea from "./ChatArea";
 import ChatSidebar from "./ChatSideBar";
 import useChat from "../utils/useChat";
@@ -11,6 +11,7 @@ const HealthBotPage = () => {
   const {
     messages,
     inputMessage,
+    activeChat,
     chatList,
     isBotTyping,
     isHistoryLoading,
@@ -47,6 +48,7 @@ const HealthBotPage = () => {
           setIsSidebarOpen={setIsSidebarOpen}
           isHistoryLoading={isHistoryLoading}
           handlenewChat={startNewChat}
+          activeChat={activeChat}
         />
       </div>
 

@@ -26,14 +26,16 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+    
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Authentication failed" });
+      return res.status(401).json({ message: "Invalid Email" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     
     if (!isMatch) {
-      return res.status(401).json({ message: "Authentication failed" });
+      return res.status(401).json({ message: "Invalid password" });
     }
     const token = jwt.sign({ userId: user._id }, "xxxyyy", {
       expiresIn: "1h",
