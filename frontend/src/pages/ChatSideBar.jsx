@@ -8,8 +8,8 @@ const ChatSidebar = ({
   setIsSidebarOpen,
   isHistoryLoading,
   handlenewChat,
-  activeChat
-}) => {
+  activeChat,
+}) => {  
   return (
     <div className="h-full w-full bg-gradient-to-b from-cyan-300 via-cyan-100 to-white shadow-xl border-r border-cyan-100 flex flex-col relative pt-6 px-4">
       {/* Mobile close button */}
@@ -22,8 +22,10 @@ const ChatSidebar = ({
       </button>
 
       {/* New Chat Button */}
-      <button className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-6 mt-4 rounded-xl bg-white/80 text-gray-800 font-semibold hover:bg-white hover:shadow transition"
-      onClick={()=>handlenewChat()}>
+      <button
+        className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-6 mt-4 rounded-xl bg-white/80 text-gray-800 font-semibold hover:bg-white hover:shadow transition"
+        onClick={() => handlenewChat()}
+      >
         <PiPlus size={18} />
         New Chat
       </button>
@@ -55,10 +57,10 @@ const ChatSidebar = ({
             <div
               key={chat.id}
               onClick={() => onSelectChat(chat)}
-              className={`${
-  activeChat.id === chat.id ? "bg-[#4ed1ef]" : ""
-} flex items-center gap-3 px-4 py-2 rounded-md bg-white/40 hover:bg-[#4ed1ef] text-gray-800 font-medium cursor-pointer transition-all truncate shadow-sm`}
->
+              className={`flex items-center gap-3 px-4 py-2 rounded-md hover:bg-[#4ed1ef] text-gray-800 font-medium cursor-pointer transition-all truncate shadow-sm ${
+  activeChat.id === chat.id ? "bg-[#4ed1ef]" : "bg-white/40"
+}`}
+            >
               <LuMessageSquareText size={18} />
               <span className="truncate">{chat.name}</span>
             </div>

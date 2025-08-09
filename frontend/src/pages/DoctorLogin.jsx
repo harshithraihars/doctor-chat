@@ -49,7 +49,7 @@ const DoctorLogin = () => {
         JSON.stringify({
           Role: "Doctor",
           Name: user,
-          Id: data.doctorId,
+          email:data.email,
         })
       );
       setUser(user);
@@ -161,7 +161,7 @@ const DoctorLogin = () => {
                       htmlFor="email"
                       className="block text-sm font-semibold text-gray-700"
                     >
-                      Doctor ID
+                      Email
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -184,7 +184,7 @@ const DoctorLogin = () => {
                         id="email"
                         {...register("email")}
                         className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                        placeholder="Enter your Doctor ID"
+                        placeholder="Enter your Email"
                       />
                     </div>
                     {errors.email && (

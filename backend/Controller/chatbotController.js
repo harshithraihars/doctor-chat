@@ -43,6 +43,8 @@ exports.sendMessage = async (req, res) => {
 
     res.json({ conversationId: conversation._id, botReply,title });
   } catch (err) {
+    console.log(err.message);
+    
     res.status(500).json({ error: err.message });
   }
 };

@@ -289,7 +289,7 @@ const HealthBot = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader color="#36d7b7" size={50} />
+        {/* <ClipLoader color="#36d7b7" size={50} /> */}
       </div>
     );
   }

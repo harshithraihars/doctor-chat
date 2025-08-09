@@ -3,6 +3,7 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const admin = require("../firebase/firebase-config");
 const registerUser = async (req, res) => {
   try {
     const { email, password, name } = req.body;
@@ -26,14 +27,13 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid Email" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
-    
+
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
@@ -43,6 +43,37 @@ const loginUser = async (req, res) => {
     res.json({ token: token, user: user.name });
   } catch (error) {
     res.status(400).json({ message: "Error logging in" });
+  }
+};
+
+const fireBaseLogin = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    // Verify Firebase token
+    const decoded = await admin.auth().verifyIdToken(token);
+
+    const { email, name } = decoded;
+
+    // Check if user exists
+    let user = await User.findOne({ email: email });
+
+    if (!user) {
+      // Create new user
+      user = await User.create({
+        email,
+        name,
+      });
+    }
+
+    const authToken = jwt.sign({ userId: user._id }, "xxxyyy", {
+      expiresIn: "1h",
+    });
+
+    res.json({ token: authToken, user: name });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ success: false, message: "Invalid Firebase token" });
   }
 };
 
@@ -133,7 +164,7 @@ const resetPassword = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    user.password = password; 
+    user.password = password;
     await user.save();
 
     return res.status(200).json({ message: "Password Updated Successfully" });
@@ -145,6 +176,7 @@ const resetPassword = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
+  fireBaseLogin,
   handleForgotPassword,
   handleVerifyOtp,
   resetPassword,

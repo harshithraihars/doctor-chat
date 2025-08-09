@@ -18,14 +18,14 @@ module.exports = (io) => {
       }, 100);
     });
 
-    socket.on("Doctor-login", async ({ id }) => {
-      const doc = await Doctor.findOne({ docId: id });
-      console.log("doctor loggedin");
-
+    socket.on("Doctor-login", async ({ email }) => {
+      const doc = await Doctor.findOne({ email:email });
+      console.log(doc);
+      
       if (doc) {
-        userSocketMap.set(id, socket.id);
+        userSocketMap.set(doc.id, socket.id);
         socketUserMap.set(socket.id, {
-          id,
+          id:doc.id,
           role: doc.specialization,
           name: doc.name,
         });
@@ -43,7 +43,7 @@ module.exports = (io) => {
           availableDoctors.push({ sockId, user });
         }
       }
-
+      
       if (availableDoctors.length === 0) {
         return socket.emit("doctor-id", {
           error: "No doctor online for this specialization",

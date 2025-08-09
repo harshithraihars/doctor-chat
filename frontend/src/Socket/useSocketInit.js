@@ -8,11 +8,11 @@ export const useSocketInit = () => {
 
     socket.connect();
 
-    setupSocket({ Role: auth.Role, user: auth.Name, Id: auth.Id });
+    setupSocket({ Role: auth.Role, user: auth.Name, email: auth.email });
   }, []);
 };
 
-export const setupSocket = ({ Role, user, Id }) => {
+export const setupSocket = ({ Role, user, email }) => {
   if (!socket.connected) socket.connect();
 
   if (socket) {
@@ -25,7 +25,7 @@ export const setupSocket = ({ Role, user, Id }) => {
         });
       } else {
         socket.emit("Doctor-login", {
-          id: Id,
+          email:email,
         });
       }
     });

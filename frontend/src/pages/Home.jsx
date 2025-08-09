@@ -30,8 +30,8 @@ const Home = () => {
         description:
           "Expert health advice is just a step away. Choose your medical area connect with an active doctor, and receive quick advice or first-aid solutions tailored to your issue. Simple, fast, and reliable care—right when you need it.",
         ctaTitle: "Transforming Healthcare with Our Doctor Consultation Bot",
-        ctaExpertButton: "🩺 Connect with Experts",
-        ctaExpertButtonAction: "/selectspecialist",
+        ctaButton: "🩺 Connect with Experts",
+        ctaAction: "/selectspecialist",
 
         ctachatBotButton: "Chat with Health-bot",
         ctaChatBotButtonAction: "/chatbot",
@@ -100,12 +100,12 @@ const Home = () => {
           </h3>
           <div className="flex md:flex-row flex-col justify-center items-center px-4 gap-3">
             <button
-              onClick={() => navigate(`${currentContent?.hero.ctaExpertButtonAction}`)}
+              onClick={() => navigate(`${currentContent?.hero.ctaAction}`)}
               className="relative bg-gradient-to-r from-[#5CF7F8] to-[#4EECF1] text-black px-5 sm:px-7 py-3 sm:py-4 font-bold text-sm sm:text-base rounded-xl overflow-hidden group transition-all duration-300 hover:scale-108 shadow-lg hover:shadow-2xl border-2 border-[#4DD5D6] hover:border-white hover:shadow-[#5CF7F8]/50 transform hover:-translate-y-1 animate-pulse hover:animate-none"
             >
               <div className="flex justify-center items-center gap-2 relative z-10">
                 <span className="tracking-wide">
-                  {currentContent?.hero.ctaExpertButton}
+                  {currentContent?.hero.ctaButton}
                 </span>
                 <FaArrowRight className="text-black transition-all duration-300 group-hover:translate-x-2 group-hover:scale-125" />
               </div>
@@ -117,7 +117,8 @@ const Home = () => {
               <div className="absolute -inset-1 bg-gradient-to-r from-[#5CF7F8] via-[#4DD5D6] to-[#5CF7F8] rounded-xl opacity-75 group-hover:opacity-100 blur-sm animate-spin-slow group-hover:animate-pulse -z-10"></div>
             </button>
 
-            <button
+            {user.Role=="Client" && (
+              <button
               onClick={() => navigate(`${currentContent?.hero.ctaChatBotButtonAction}`)}
               className="relative bg-gradient-to-r from-[#5CF7F8] to-[#4EECF1] text-black px-5 sm:px-7 py-3 sm:py-4 font-bold text-sm sm:text-base rounded-xl overflow-hidden group transition-all duration-300 hover:scale-108 shadow-lg hover:shadow-2xl border-2 border-[#4DD5D6] hover:border-white hover:shadow-[#5CF7F8]/50 transform hover:-translate-y-1 animate-pulse hover:animate-none"
             >
@@ -133,6 +134,7 @@ const Home = () => {
               {/* Rotating Border Effect */}
               <div className="absolute -inset-1 bg-gradient-to-r from-[#5CF7F8] via-[#4DD5D6] to-[#5CF7F8] rounded-xl opacity-75 group-hover:opacity-100 blur-sm animate-spin-slow group-hover:animate-pulse -z-10"></div>
             </button>
+            )}
           </div>
         </div>
       </section>
