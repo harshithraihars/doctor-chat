@@ -96,4 +96,4 @@ public/client/*
 .DS_Store
 Thumbs.db
 
-firebase/firebase-service-account.json
+firebase/firebaseservice.json

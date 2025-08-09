@@ -1,4 +1,4 @@
-const serviceAccount = require("./firebase-service-account.json");
+const serviceAccount = require("./firebaseservice.json");
 const admin = require("firebase-admin");
 
 
