@@ -5,6 +5,7 @@ const socketUserMap = new Map(); // socketId → { id, role, name }
 const doctorClientMap = new Map(); // doctorId → Set of userIds
 const availabeSpecializiation = new Set();
 const peerMap = new Map();
+
 module.exports = (io) => {
   io.on("connection", (socket) => {
     socket.on("Client-login", ({ id, role, name }) => {

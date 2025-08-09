@@ -95,3 +95,5 @@ public/client/*
 # MacOS and Windows specific files
 .DS_Store
 Thumbs.db
+
+firebase/firebase-service-account.json
