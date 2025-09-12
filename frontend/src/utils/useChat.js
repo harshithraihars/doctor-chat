@@ -89,6 +89,12 @@ const useChat = () => {
       }
     } catch (err) {
       console.error("Send failed", err);
+      const botMessage = {
+        sender: "bot",
+        content: "Something went wrong...",
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, botMessage]);
     } finally {
       setInputMessage("");
       setIsBotTyping(false);

@@ -14,7 +14,6 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoSearch } from "react-icons/io5";
 import { useAuth } from "../contexts/AuthContext";
-import { ClipLoader } from "react-spinners";
 import { socket } from "../Socket/Socket";
 import ProfileSidebar from "../components/ProfileSideBar";
 import Loading from "./Loading";
@@ -24,9 +23,8 @@ import PeerDisconnectedPopup from "./peerDisconnectPopup";
 import { useLocation, useMatch } from "react-router-dom";
 
 const HealthBot = () => {
-  const {pathname}=useLocation()
+  const { pathname } = useLocation();
   const currentPage = pathname.slice(1);
-  
 
   // Audio instances
   const sendAudio = new Audio(sendSound);
@@ -157,9 +155,8 @@ const HealthBot = () => {
         [fromId]: [...(prevChats[fromId] || []), newMessage],
       }));
 
-
       console.log(currentPage);
-      
+
       // if(currentPage!="health-bot"){
       //   toast.success(`${connectionDetails.receiverName}:${message}`)
       // }
@@ -192,7 +189,13 @@ const HealthBot = () => {
         scrollToBottom();
       }, 100);
     }
-  }, [chatData, selectedClientId, connectionDetails.receiverSocketId, user?.Role, scrollToBottom]);
+  }, [
+    chatData,
+    selectedClientId,
+    connectionDetails.receiverSocketId,
+    user?.Role,
+    scrollToBottom,
+  ]);
 
   // Message sending logic
   const handleSendMessage = useCallback(() => {
@@ -255,28 +258,24 @@ const HealthBot = () => {
   };
 
   // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("auth");
-    localStorage.removeItem("assignedDoctor");
-  };
+  
 
   const commonProps = {
-  user,
-  specialist,
-  connectionDetails,
-  selectedClientId,
-  setSelectedClientId,
-  clientList,
-  unreadCounts,
-  messageInput,
-  setMessageInput,
-  handleSendMessage,
-  handleClientSelect,
-  getCurrentMessages,
-  handleLogout,
-  messagesEndRef,
-  chatData,
-};
+    user,
+    specialist,
+    connectionDetails,
+    selectedClientId,
+    setSelectedClientId,
+    clientList,
+    unreadCounts,
+    messageInput,
+    setMessageInput,
+    handleSendMessage,
+    handleClientSelect,
+    getCurrentMessages,
+    messagesEndRef,
+    chatData,
+  };
 
   socket.on("peer-disconnected", () => {
     setPeerDisconnected(true);
@@ -307,7 +306,7 @@ const HealthBot = () => {
   return (
     <div>
       <div className="hidden lg:flex flex-col lg:flex-row w-screen bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0]">
-        <ProfileSidebar user={user} handleLogout={handleLogout} />
+        <ProfileSidebar user={user}/>
 
         <div
           className={`container mx-auto px-4 py-8 ${
@@ -402,8 +401,8 @@ const HealthBot = () => {
                   </div>
 
                   {/* Fixed scroll container with proper ref */}
-                  <div 
-                    className="h-96 overflow-y-auto p-6 custom-scrollbar" 
+                  <div
+                    className="h-96 overflow-y-auto p-6 custom-scrollbar"
                     ref={scrollContainerRef}
                   >
                     {getCurrentMessages().map((message, index) => (

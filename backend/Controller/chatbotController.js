@@ -5,7 +5,8 @@ const {
 } = require("../utils/grokClient");
 
 exports.sendMessage = async (req, res) => {
-  const { message, conversationId } = req.body;
+  
+  const { message, conversationId } = req.body;  
   const userId = req.user.userId;
 
   let title=null

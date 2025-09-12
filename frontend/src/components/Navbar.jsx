@@ -24,7 +24,7 @@ import { auth } from "../firebase/firebase.config";
 import logo from "../assets/images/logo.png";
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, logout, doctor, setDoctor } = useAuth();
+  const { user, logout, doctor} = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const Role = JSON.parse(localStorage.getItem("auth"))?.Role;
   // console.log(localStorage.getItem());

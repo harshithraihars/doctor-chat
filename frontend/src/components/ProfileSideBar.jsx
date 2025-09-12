@@ -2,8 +2,23 @@ import React from "react";
 import { motion } from "framer-motion";
 import { LogOut, UserCircle } from "lucide-react";
 import Avatar from "@mui/material/Avatar";
+import { useNavigate } from "react-router-dom";
+import {signOut} from "firebase/auth"
+import {auth} from "../firebase/firebase.config"
+import toast from "react-hot-toast";
+const ProfileSidebar = ({ user }) => {
 
-const ProfileSidebar = ({ user, handleLogout }) => {
+  const navigate=useNavigate()
+
+  const handleLogout = () => {    
+    localStorage.removeItem("assignedDoctor");
+    localStorage.removeItem("token");
+    navigate("/login");
+    signOut(auth);
+    localStorage.removeItem("lastActiveChatId");
+    toast.success("Logged out successfully");
+  }
+
   return (
     <motion.aside
       initial={{ opacity: 0, y: 20 }}
@@ -41,14 +56,17 @@ const ProfileSidebar = ({ user, handleLogout }) => {
       {/* Logout Button */}
       <motion.button
         whileTap={{ scale: 0.95 }}
-        onClick={handleLogout}
+        onClick={()=>handleLogout()}
         className="
           mt-4 px-6 py-2 rounded-md bg-emerald-600 text-white font-semibold
           shadow-md  transition duration-300
           relative z-10 hover:scale-105 hover:bg-red-400
         "
       >
-        <div className="flex gap-2 items-center justify-center">
+        <div
+          className="flex gap-2 items-center justify-center"
+          
+        >
           <LogOut size={20} />
           <span>Log Out</span>
         </div>

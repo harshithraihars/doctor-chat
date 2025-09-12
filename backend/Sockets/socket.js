@@ -20,9 +20,7 @@ module.exports = (io) => {
     });
 
     socket.on("Doctor-login", async ({ email }) => {
-      const doc = await Doctor.findOne({ email:email });
-      console.log(doc);
-      
+      const doc = await Doctor.findOne({ email:email });      
       if (doc) {
         userSocketMap.set(doc.id, socket.id);
         socketUserMap.set(socket.id, {
@@ -31,7 +29,6 @@ module.exports = (io) => {
           name: doc.name,
         });
         availabeSpecializiation.add(doc.specialization);
-        console.log(`🩺 Doctor logged in: ${doc.name} (${doc.specialization})`);
       }
     });
 
