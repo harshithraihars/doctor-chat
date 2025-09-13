@@ -55,7 +55,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/user/login", // Backend API endpoint
+        "https://doctor-chat-txh9.onrender.com/api/user/login", // Backend API endpoint
         {
           email: data.email,
           password: data.password,
@@ -81,7 +81,7 @@ const Login = () => {
       const fireBaseuser = await googleSignUp();
       const fireBasetoken = await fireBaseuser.getIdToken();
       const response = await axios.post(
-        "http://localhost:5000/api/user/firebase-login",
+        "https://doctor-chat-txh9.onrender.com/api/user/firebase-login",
         {
           token:fireBasetoken,
         }
