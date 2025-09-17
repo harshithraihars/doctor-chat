@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import LazyLoad from "../components/LazyLoad";
+import AvailableDoctorsPage from "../pages/AvailableDoctorsPage";
 
 const Home = lazy(() => import("../pages/Home"));
 const Login = lazy(() => import("../pages/Login"));
@@ -12,7 +13,7 @@ const SelectSpecialist = lazy(() => import("../pages/SelectSpecialist"));
 const HealthBot = lazy(() => import("../pages/HealthBot"));
 const PrivateRoute = lazy(() => import("../components/PrivateRoute"));
 const DoctorRegister = lazy(() => import("../pages/DoctorRegister"));
-const ChatBot=lazy(()=>import("../pages/ChatBot"))
+const ChatBot = lazy(() => import("../pages/ChatBot"));
 export default function AppRoutes() {
   return (
     <Suspense fallback={<LazyLoad />}>
@@ -22,7 +23,6 @@ export default function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/DocLogin" element={<DoctorLogin />} />
         <Route path="/DocRegister" element={<DoctorRegister />} />
-
         <Route
           path="/selectspecialist"
           element={
@@ -31,7 +31,6 @@ export default function AppRoutes() {
             </PrivateRoute>
           }
         />
-
         <Route
           path="/chat"
           element={
@@ -61,6 +60,14 @@ export default function AppRoutes() {
           element={
             <PrivateRoute>
               <Home />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/connect-doctor"
+          element={
+            <PrivateRoute>
+              <AvailableDoctorsPage />
             </PrivateRoute>
           }
         />

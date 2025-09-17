@@ -36,14 +36,15 @@ const SelectSpecialist = () => {
   }, [navigate]);
 
   const handleClick = (specialist) => {
-    setisFindingDoctor(true);
-    setSelectedSpecialist(specialist);
-    setTimeout(() => {
-      socket.emit("specialization", {
-        specialization: specialist,
-        userId: user?.id || user?._id,
-      });
-    }, 1000);
+    navigate("/connect-doctor")
+    // setisFindingDoctor(true);
+    // setSelectedSpecialist(specialist);
+    // setTimeout(() => {
+    //   socket.emit("specialization", {
+    //     specialization: specialist,
+    //     userId: user?.id || user?._id,
+    //   });
+    // }, 1000);
   };
 
   // show the doctors status wheather he is available or not
