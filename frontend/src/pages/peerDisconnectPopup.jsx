@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { XOctagon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useAuth } from "../contexts/AuthContext";
+// import { useAuth } from "../contexts/AuthContext";
 import { auth } from "../firebase/firebase.config";
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +12,7 @@ const PeerDisconnectedModal = ({
   autoCloseMs = 8000,
 }) => {
   const navigate = useNavigate("");
-  const { setSpecialist } = useAuth();
+  // const { setSpecialist } = useAuth();
 
   const onClose = () => {
     setPeerDisconnected(false);

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import { useAuth } from "../contexts/AuthContext";
+// import { useAuth } from "../contexts/AuthContext";
 import LeftSideBar from "../components/LeftSideBar";
 import { googleSignUp } from "../firebase/AuthFunction";
 import { setupSocket } from "../Socket/useSocketInit";
@@ -12,6 +12,8 @@ import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import loginImg from "../assets/images/login.png";
 import googleImg from "../assets/images/google.png";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../redux/appSlice";
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("Password is required"),
@@ -19,10 +21,12 @@ const schema = yup.object().shape({
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  // const { setUser } = useAuth();
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [googleSignupLoading, setGoogleSignUpLoading] = useState(false);
+
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -31,31 +35,31 @@ const Login = () => {
     resolver: yupResolver(schema),
   });
 
-  const setUpUser = (user) => {
-    setUser({
-      Role: "Client",
-      Name: user,
-    });
+  // const setUpUser = (user) => {
+  //   setUser({
+  //     Role: "Client",
+  //     Name: user,
+  //   });
 
-    localStorage.setItem(
-      "auth",
-      JSON.stringify({
-        Role: "Client",
-        Name: user,
-      })
-    );
+  //   localStorage.setItem(
+  //     "auth",
+  //     JSON.stringify({
+  //       Role: "Client",
+  //       Name: user,
+  //     })
+  //   );
 
-    navigate("/");
+  //   navigate("/");
 
-    setupSocket({ Role: "Client", user: user });
-  };
+  //   setupSocket({ Role: "Client", user: user });
+  // };
 
   const onSubmit = async (data) => {
     setError(null);
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "https://doctor-chat-txh9.onrender.com/api/user/login", // Backend API endpoint
+        "http://localhost:5000/api/user/login", // Backend API endpoint
         {
           email: data.email,
           password: data.password,
@@ -64,8 +68,16 @@ const Login = () => {
 
       const { token, user } = response.data;
 
-      setUpUser(user);
+      const userData={ name:user, role: "client" };
       localStorage.setItem("token", token);
+      dispatch(
+        loginSuccess({
+          user:userData,
+          token,
+        })
+      );
+
+      navigate("/")
     } catch (error) {
       const serverMsg = error.response?.data?.message;
       setError(serverMsg || "Invalid email or password. Please try again.");
@@ -81,9 +93,9 @@ const Login = () => {
       const fireBaseuser = await googleSignUp();
       const fireBasetoken = await fireBaseuser.getIdToken();
       const response = await axios.post(
-        "https://doctor-chat-txh9.onrender.com/api/user/firebase-login",
+        "http://localhost:5000/api/user/firebase-login",
         {
-          token:fireBasetoken,
+          token: fireBasetoken,
         }
       );
 
@@ -91,7 +103,6 @@ const Login = () => {
 
       setUpUser(user);
       localStorage.setItem("token", token);
-
     } catch (error) {
       setError("Google Sign-Up Failed:");
       console.log(error.message);

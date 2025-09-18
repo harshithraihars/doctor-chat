@@ -1,14 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-
 const PrivateRoute = ({ children }) => {
-  const { user,isAuthLoading } = useAuth();
-  if (isAuthLoading) {
-    return <div>Loading...</div>; // or a spinner
-  }
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
 

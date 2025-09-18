@@ -1,25 +1,26 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, Activity, Users, DollarSign, Bot } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
 import { FaArrowRight } from "react-icons/fa";
 import { socket } from "../Socket/Socket";
 import homeimg from "../assets/images/home.png";
+import { useSelector } from "react-redux";
 const Home = () => {
   const navigate = useNavigate();
-  const { user, setUser, setAvailableDoctors } = useAuth();
-
+  const {user}=useSelector((state)=>state.auth)
+  console.log(user);
+  
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("auth")));
+    // setUser(JSON.parse(localStorage.getItem("auth")));
     // if (user.Role == "Doctor") navigate("/health-bot");
   }, []);
 
   socket.on("available-doctors", (availabeSpecializiation) => {
-    setAvailableDoctors(new Set(availabeSpecializiation));
+    // setAvailableDoctors(new Set(availabeSpecializiation));
   });
 
   const content = {
-    Client: {
+    client: {
       header: {
         title: "Welcome to HealthCare App",
         subtitle: "Your Health, Our Priority",
@@ -37,7 +38,7 @@ const Home = () => {
         ctaChatBotButtonAction: "/chatbot",
       },
     },
-    Doctor: {
+    doctor: {
       header: {
         title: "Welcome to HealthCare Platform",
         subtitle: "Empowering Healthcare Professionals",
@@ -54,7 +55,7 @@ const Home = () => {
     },
   };
 
-  const currentContent = content[user?.Role];
+  const currentContent = content[user?.role];
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0] min-h-screen">
@@ -117,7 +118,7 @@ const Home = () => {
               <div className="absolute -inset-1 bg-gradient-to-r from-[#5CF7F8] via-[#4DD5D6] to-[#5CF7F8] rounded-xl opacity-75 group-hover:opacity-100 blur-sm animate-spin-slow group-hover:animate-pulse -z-10"></div>
             </button>
 
-            {user.Role=="Client" && (
+            {user.role=="client" && (
               <button
               onClick={() => navigate(`${currentContent?.hero.ctaChatBotButtonAction}`)}
               className="relative bg-gradient-to-r from-[#5CF7F8] to-[#4EECF1] text-black px-5 sm:px-7 py-3 sm:py-4 font-bold text-sm sm:text-base rounded-xl overflow-hidden group transition-all duration-300 hover:scale-108 shadow-lg hover:shadow-2xl border-2 border-[#4DD5D6] hover:border-white hover:shadow-[#5CF7F8]/50 transform hover:-translate-y-1 animate-pulse hover:animate-none"
@@ -139,7 +140,7 @@ const Home = () => {
         </div>
       </section>
 
-      {user.Role == "Client" && (
+      {user.role == "client" && (
         <div>
           {/* Features Section */}
           <section className="mb-12 sm:mb-16">

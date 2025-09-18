@@ -13,7 +13,7 @@ import userImg from "../assets/images/user.png";
 import { FaArrowLeft } from "react-icons/fa6";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoSearch } from "react-icons/io5";
-import { useAuth } from "../contexts/AuthContext";
+// import { useAuth } from "../contexts/AuthContext";
 import { socket } from "../Socket/Socket";
 import ProfileSidebar from "../components/ProfileSideBar";
 import Loading from "./Loading";
@@ -31,8 +31,8 @@ const HealthBot = () => {
   const messageAudio = new Audio(messageSound);
 
   // Auth context
-  const { user, setUser, specialist, chatData, setChatData, setSpecialist } =
-    useAuth();
+  // const { user, setUser, specialist, chatData, setChatData, setSpecialist } =
+    // useAuth();
 
   // State management
   const [connectionDetails, setConnectionDetails] = useState({

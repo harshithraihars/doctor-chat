@@ -15,7 +15,7 @@ const useChat = () => {
 
   const fetchChatHistory = useCallback(async () => {
     try {
-    const res = await fetch("https://doctor-chat-txh9.onrender.com/api/chatbot/history", {
+    const res = await fetch("http://localhost:5000/api/chatbot/history", {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -57,7 +57,7 @@ const useChat = () => {
     setIsBotTyping(true);
 
     try {
-      const res = await fetch("https://doctor-chat-txh9.onrender.com/api/chatbot/message", {
+      const res = await fetch("http://localhost:5000/api/chatbot/message", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +105,7 @@ const useChat = () => {
   const handleChatSelect = async (chat) => {
     try {
       setIsMessagesLoading(true);
-      const res = await fetch(`https://doctor-chat-txh9.onrender.com/api/chatbot/conversation/${chat.id}`, {
+      const res = await fetch(`http://localhost:5000/api/chatbot/conversation/${chat.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

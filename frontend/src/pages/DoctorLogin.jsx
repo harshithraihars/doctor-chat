@@ -4,20 +4,20 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import { useAuth } from "../contexts/AuthContext";
+// import { useAuth } from "../contexts/AuthContext";
 import LeftSideBar from "../components/LeftSideBar";
 import { setupSocket } from "../Socket/useSocketInit";
 import toast from "react-hot-toast";
-import loginImg from "../assets/images/login.png"
+import loginImg from "../assets/images/login.png";
 const schema = yup.object().shape({
   email: yup.string().required("Doctor ID is required"),
   password: yup.string().required("Password is required"),
 });
 
 const DoctorLogin = () => {
-  const { setDoctorId } = useAuth();
+  // const { setDoctorId } = useAuth();
   const navigate = useNavigate();
-  const { user, setUser, doctor, setDoctor } = useAuth();
+  // const { user, setUser, doctor, setDoctor } = useAuth();
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const {
@@ -33,9 +33,9 @@ const DoctorLogin = () => {
     setIsLoading(true);
     try {
       console.log(data.email);
-      
+
       const response = await axios.post(
-        "https://doctor-chat-txh9.onrender.com/api/doctor/login", // Backend API endpoint
+        "http://localhost:5000/api/doctor/login", // Backend API endpoint
         {
           email: data.email,
           password: data.password,
@@ -44,25 +44,28 @@ const DoctorLogin = () => {
 
       // Navigate to the doctor's home page after successful login
       const { token, user } = response.data;
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({
-          Role: "Doctor",
-          Name: user,
-          email:data.email,
-        })
-      );
-      setUser(user);
 
-      setupSocket({ Id: data.doctorId });
-      localStorage.setItem("token", token);
-      setDoctorId(data.doctorId);
+      dispatch(loginSuccess({ user, token }));
+
+      // localStorage.setItem(
+      //   "auth",
+      //   JSON.stringify({
+      //     Role: "Doctor",
+      //     Name: user,
+      //     email:data.email,
+      //   })
+      // );
+      // setUser(user);
+
+      // setupSocket({ Id: data.doctorId });
+      // localStorage.setItem("token", token);
+      // setDoctorId(data.doctorId);
       toast.success("Logged in Successfully");
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
       setError("Invalid Doctor ID or password. Please try again.");
-      toast
+      toast;
     } finally {
       setIsLoading(false);
     }

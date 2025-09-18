@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Heart,
   LogOut,
   Menu,
   X,
@@ -9,33 +8,37 @@ import {
   Bot,
   UserCircle,
   Shield,
-  Activity,
-  Bell,
-  Settings,
   Stethoscope,
   User,
 } from "lucide-react";
 import { FaUserDoctor } from "react-icons/fa6";
-import { useAuth } from "../contexts/AuthContext";
+// import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import Avatar from "@mui/material/Avatar";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
 import logo from "../assets/images/logo.png";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/appSlice";
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, logout, doctor} = useAuth();
+  const dispatch=useDispatch();
+
+  // const { user, logout, doctor} = useAuth();
+  const {user,isAuthenticated}=useSelector((state)=>state.auth)
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const Role = JSON.parse(localStorage.getItem("auth"))?.Role;
   // console.log(localStorage.getItem());
 
   const handleLogout = () => {
-    localStorage.removeItem("assignedDoctor");
-    localStorage.removeItem("token");
-    logout();
-    navigate("/");
-    signOut(auth);
-    localStorage.removeItem("lastActiveChatId")
+    // localStorage.removeItem("assignedDoctor");
+    // localStorage.removeItem("token");
+    // logout();
+    // navigate("/");
+    // signOut(auth);
+    // localStorage.removeItem("lastActiveChatId")
+    dispatch(logout())
     toast.success("Logged out successfully");
   };
 
@@ -77,7 +80,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {Role ? (
+            {isAuthenticated ? (
               // Patient Navigation
               <>
                 <Link
@@ -105,7 +108,7 @@ const Navbar = () => {
                 </Link>
                 {/* User Profile */}
                 <div className="flex items-center space-x-3 pl-4 border-l border-gray-400">
-                  {Role == "Client" ? (
+                  {user.role == "client" ? (
                     <div className="flex items-center space-x-2">
                       <Avatar
                         src="https://tse3.mm.bing.net/th?id=OIP.btgP01toqugcXjPwAF-k2AHaHa&pid=Api&P=0&h=180"
@@ -202,7 +205,7 @@ const Navbar = () => {
         }`}
       >
         <div className="bg-gradient-to-b from-cyan-300 to-cyan-400 border-t border-gray-400/20">
-          {user ? (
+          {user.role=="client" ? (
             // Mobile Patient Menu
             <div className="px-4 py-2">
               <div className="flex items-center space-x-3 p-3 bg-white/10 rounded-lg mb-3">
@@ -243,7 +246,7 @@ const Navbar = () => {
                 <span>Logout</span>
               </button>
             </div>
-          ) : doctor ? (
+          ) : "doctor" ? (
             // Mobile Doctor Menu
             <div className="px-4 py-2">
               <div className="flex items-center space-x-3 p-3 bg-white/10 rounded-lg mb-3">

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+// import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 
 import Footer from "./components/Footer";
@@ -10,8 +10,10 @@ import { Toaster } from "react-hot-toast";
 
 function App() {
   useSocketInit();
+
   return (
-    <AuthProvider>
+    // <AuthProvider>
+    <div>
       <Router basename="/doctor-chat">
         <div className="flex flex-col min-h-screen">
           <Navbar />
@@ -21,8 +23,10 @@ function App() {
           <Footer />
         </div>
       </Router>
-      <Toaster position="top-center" reverseOrder={false}/>
-    </AuthProvider>
+      <Toaster position="top-center" reverseOrder={false} />
+    </div>
+
+    // </AuthProvider>
   );
 }
 
