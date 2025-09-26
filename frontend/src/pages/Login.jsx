@@ -12,8 +12,9 @@ import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import loginImg from "../assets/images/login.png";
 import googleImg from "../assets/images/google.png";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../redux/appSlice";
+import { initializeSocket } from "../Socket/socketActions";
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("Password is required"),
@@ -26,6 +27,8 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [googleSignupLoading, setGoogleSignUpLoading] = useState(false);
 
+  const socket = useSelector((state) => state.socket);
+
   const dispatch = useDispatch();
   const {
     register,
@@ -35,28 +38,10 @@ const Login = () => {
     resolver: yupResolver(schema),
   });
 
-  // const setUpUser = (user) => {
-  //   setUser({
-  //     Role: "Client",
-  //     Name: user,
-  //   });
-
-  //   localStorage.setItem(
-  //     "auth",
-  //     JSON.stringify({
-  //       Role: "Client",
-  //       Name: user,
-  //     })
-  //   );
-
-  //   navigate("/");
-
-  //   setupSocket({ Role: "Client", user: user });
-  // };
-
   const onSubmit = async (data) => {
     setError(null);
     setIsLoading(true);
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/user/login", // Backend API endpoint
@@ -68,14 +53,19 @@ const Login = () => {
 
       const { token, user } = response.data;
 
-      const userData={ name:user, role: "client" };
+      const auth={ name:user, role: "client" };
       localStorage.setItem("token", token);
+      localStorage.setItem("auth",JSON.stringify(auth))
+
       dispatch(
         loginSuccess({
-          user:userData,
+          user:auth,
           token,
         })
       );
+      
+      dispatch(initializeSocket(token));
+
 
       navigate("/")
     } catch (error) {

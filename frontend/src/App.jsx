@@ -5,11 +5,36 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 import AppRoutes from "./routes/AppRoutes";
-import { useSocketInit } from "./Socket/useSocketInit";
 import { Toaster } from "react-hot-toast";
+import { initializeSocket } from "./Socket/socketActions";
+import { disconnectSocket } from "./redux/socketSlice";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "./redux/appSlice";
 
 function App() {
-  useSocketInit();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const auth = JSON.parse(localStorage.getItem("auth"));
+
+    if (auth && token) {
+      dispatch(initializeSocket(token)); // connect once on app load if logged in
+
+      dispatch(
+        loginSuccess({
+          user: auth,
+          token,
+        })
+      );
+
+    }
+
+    return () => {
+      dispatch(disconnectSocket());
+    };
+  }, [dispatch]);
 
   return (
     // <AuthProvider>

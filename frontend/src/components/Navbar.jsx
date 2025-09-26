@@ -15,30 +15,25 @@ import { FaUserDoctor } from "react-icons/fa6";
 // import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import Avatar from "@mui/material/Avatar";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase/firebase.config";
 import logo from "../assets/images/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/appSlice";
+import { disconnectSocket } from "../redux/socketSlice";
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch=useDispatch();
 
   // const { user, logout, doctor} = useAuth();
   const {user,isAuthenticated}=useSelector((state)=>state.auth)
-  
+    
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const Role = JSON.parse(localStorage.getItem("auth"))?.Role;
+  // const Role = JSON.parse(localStorage.getItem("auth"))?.role;
   // console.log(localStorage.getItem());
 
   const handleLogout = () => {
-    // localStorage.removeItem("assignedDoctor");
-    // localStorage.removeItem("token");
-    // logout();
-    // navigate("/");
-    // signOut(auth);
-    // localStorage.removeItem("lastActiveChatId")
     dispatch(logout())
+    dispatch(disconnectSocket())
+    localStorage.removeItem("token");
     toast.success("Logged out successfully");
   };
 
@@ -148,7 +143,7 @@ const Navbar = () => {
 
                   <button
                     onClick={
-                      Role == "Client"
+                      user.role == "client"
                         ? () => handleLogout()
                         : () => handleDoctorLogout()
                     }

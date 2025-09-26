@@ -10,6 +10,7 @@ const Home = () => {
   const {user}=useSelector((state)=>state.auth)
   console.log(user);
   
+  
   useEffect(() => {
     // setUser(JSON.parse(localStorage.getItem("auth")));
     // if (user.Role == "Doctor") navigate("/health-bot");
