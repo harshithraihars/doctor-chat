@@ -19,6 +19,8 @@ function registerChatHandlers(io, socket) {
   });
 
   socket.on("disconnect", () => {
+    console.log("disconnected");
+    
     if (socket.userId) {
       onlineUsers.delete(socket.userId);
       io.emit("doctor:offline", socket.userId);
