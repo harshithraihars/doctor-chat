@@ -3,12 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { socket } from "../Socket/Socket";
 import DoctorConnectStatus from "./DoctorConnectStatus";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
 const SelectSpecialist = () => {
   const [showUnavailable, setShowUnavailable] = useState(false);
-  // const { setSpecialist, user, availableDoctors, specialist } = useAuth();
+
+  const {token}=useSelector((state)=>state.auth)
   const [selectedSpecialist, setSelectedSpecialist] = useState(null);
   const navigate = useNavigate();
   const [isFindingDoctor, setisFindingDoctor] = useState(false);
+
 
   useEffect(() => {
     const handleDoctorAssigned = ({ role, name, sockId, error }) => {
@@ -34,8 +38,9 @@ const SelectSpecialist = () => {
     };
   }, [navigate]);
 
-  const handleClick = (specialist) => {
-    navigate("/connect-doctor")
+  const handleClick = async (specialist) => {
+    navigate(`/doctors/available/${specialist}`)
+    
     // setisFindingDoctor(true);
     // setSelectedSpecialist(specialist);
     // setTimeout(() => {

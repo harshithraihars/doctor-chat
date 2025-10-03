@@ -9,15 +9,17 @@ import LeftSideBar from "../components/LeftSideBar";
 import { setupSocket } from "../Socket/useSocketInit";
 import toast from "react-hot-toast";
 import loginImg from "../assets/images/login.png";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../redux/appSlice";
 const schema = yup.object().shape({
   email: yup.string().required("Doctor ID is required"),
   password: yup.string().required("Password is required"),
 });
 
 const DoctorLogin = () => {
-  // const { setDoctorId } = useAuth();
+
+  const dispatch=useDispatch()
   const navigate = useNavigate();
-  // const { user, setUser, doctor, setDoctor } = useAuth();
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const {
@@ -43,27 +45,18 @@ const DoctorLogin = () => {
       );
 
       // Navigate to the doctor's home page after successful login
+
       const { token, user } = response.data;
 
-      dispatch(loginSuccess({ user, token }));
+      const auth = { name: user, role: "doctor" };
 
-      // localStorage.setItem(
-      //   "auth",
-      //   JSON.stringify({
-      //     Role: "Doctor",
-      //     Name: user,
-      //     email:data.email,
-      //   })
-      // );
-      // setUser(user);
+      dispatch(loginSuccess({ user: auth, token }));
 
-      // setupSocket({ Id: data.doctorId });
-      // localStorage.setItem("token", token);
-      // setDoctorId(data.doctorId);
       toast.success("Logged in Successfully");
       navigate("/");
     } catch (error) {
-      console.error("Login error:", error);
+      console.log(error.message);
+      
       setError("Invalid Doctor ID or password. Please try again.");
       toast;
     } finally {

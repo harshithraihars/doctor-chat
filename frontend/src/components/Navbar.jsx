@@ -19,6 +19,7 @@ import logo from "../assets/images/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/appSlice";
 import { disconnectSocket } from "../redux/socketSlice";
+import { removeSocket } from "../Socket/socketActions";
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch=useDispatch();
@@ -32,14 +33,13 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout())
-    dispatch(disconnectSocket())
-    localStorage.removeItem("token");
+    dispatch(removeSocket())
     toast.success("Logged out successfully");
   };
 
   const handleDoctorLogout = () => {
-    localStorage.removeItem("auth");
-    localStorage.removeItem("token");
+    dispatch(logout())
+    dispatch(removeSocket())
     navigate("/DocLogin");
   };
 

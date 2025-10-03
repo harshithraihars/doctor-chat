@@ -1,10 +1,29 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Filter, UserCircle, MessageCircle, Stethoscope, Heart, Brain, Eye, Users, Baby, Bone, Activity, Microscope } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const AvailableDoctorsPage = () => {
+  const {token}=useSelector((state)=>state.auth)
+
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const { specialist } = useParams();
+  const [availableDoctors, setAvailableDoctors] = useState([]);
 
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      const res = await fetch(
+        `http://localhost:5000/api/socket/specialist/${specialist}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+      console.log(data);
+      
+      setAvailableDoctors(data);
+    };
+    fetchDoctors();
+  }, [specialist]);
   // Sample doctors data
   const doctors = [
     {
@@ -64,6 +83,8 @@ const AvailableDoctorsPage = () => {
       image: "/api/placeholder/80/80"
     }
   ];
+
+  
 
   // Filter and sort doctors
   const filteredDoctors = useMemo(() => {
@@ -182,7 +203,7 @@ const AvailableDoctorsPage = () => {
 
         {/* Doctors Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4">
-          {filteredDoctors.map((doctor) => (
+          {availableDoctors.map((doctor) => (
             <div
               key={doctor.id}
               className="bg-gradient-to-br from-teal-400 to-cyan-500 rounded-2xl px-4 py-6 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-white relative overflow-hidden hover:cursor-pointer"
@@ -218,13 +239,13 @@ const AvailableDoctorsPage = () => {
 
               {/* Doctor Info */}
               <div className="text-center mb-4">
-                <h3 className="font-bold text-base mb-1">{doctor.specialization}</h3>
-                <h4 className="font-medium text-sm text-teal-100">{doctor.name}</h4>
+                <h3 className="font-bold text-base mb-1">{doctor.name}</h3>
+                <h4 className="font-medium text-sm text-teal-100">{specialist}</h4>
               </div>
 
               {/* Action Button */}
               <div className="flex justify-center">
-                {doctor.isOnline ? (
+                {doctor.iOnline ? (
                   <button
                     onClick={() => handleConsultNow(doctor)}
                     className="bg-white text-teal-600 px-4 py-2 rounded-lg font-bold hover:bg-teal-50 transition-all duration-300 shadow-md hover:shadow-lg text-sm w-full"

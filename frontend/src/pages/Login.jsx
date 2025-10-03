@@ -54,20 +54,11 @@ const Login = () => {
       const { token, user } = response.data;
 
       const auth={ name:user, role: "client" };
-      localStorage.setItem("token", token);
-      localStorage.setItem("auth",JSON.stringify(auth))
 
-      dispatch(
-        loginSuccess({
-          user:auth,
-          token,
-        })
-      );
+      dispatch(loginSuccess({user:auth,token}));
       
-      dispatch(initializeSocket(token));
-
-
       navigate("/")
+
     } catch (error) {
       const serverMsg = error.response?.data?.message;
       setError(serverMsg || "Invalid email or password. Please try again.");

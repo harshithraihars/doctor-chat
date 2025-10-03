@@ -64,7 +64,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/connect-doctor"
+          path="/doctors/available/:specialist"
           element={
             <PrivateRoute>
               <AvailableDoctorsPage />

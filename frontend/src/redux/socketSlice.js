@@ -10,7 +10,7 @@ const socketSlice = createSlice({
     setSocket: (state, action) => {
       state.socket = state.socket || action.payload; // prevents duplicate
     },
-    disconnectSocket: (state) => {
+    disconnectSocket: (state) => {      
       if (state.socket) {
         state.socket.disconnect();
         state.socket = null;
