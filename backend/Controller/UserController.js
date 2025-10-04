@@ -7,14 +7,12 @@ const admin = require("../firebase/firebase-config");
 const registerUser = async (req, res) => {
   try {
     const { email, password, name } = req.body;
-    console.log(req.body);
 
     if (!email || !password || !name) {
       return res.status(400).json({ message: "All fields are Required" });
     }
     const user = new User({ email, password, name });
     await user.save();
-    console.log("done correct");
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
@@ -32,15 +30,16 @@ const loginUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid Email" });
     }
+    
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
-    const token = jwt.sign({ userId: user._id }, "xxxyyy", {
+    const token = jwt.sign({ userId: user._id,role:"client"}, "xxxyyy", {
       expiresIn: "1h",
     });
-    res.json({ token: token, user: user.name });
+    res.json({ token: token, user: user.name,userId:user._id });
   } catch (error) {
     res.status(400).json({ message: "Error logging in" });
   }

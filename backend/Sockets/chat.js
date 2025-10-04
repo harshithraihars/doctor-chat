@@ -3,6 +3,13 @@ const jwt = require("jsonwebtoken");
 let onlineUsers = new Map();
 
 function registerChatHandlers(io, socket) {
+
+  socket.on("joinRoom", ({ roomId }) => {
+    console.log("joined the room with romm id",roomId);
+    
+    socket.join(roomId);
+  });
+
   socket.on("message:send", (data) => {
     const { toUserId, message } = data;
     const targetSocketId = onlineUsers.get(toUserId);
@@ -20,7 +27,7 @@ function registerChatHandlers(io, socket) {
 
   socket.on("disconnect", () => {
     console.log("disconnected");
-    
+
     if (socket.userId) {
       onlineUsers.delete(socket.userId);
       io.emit("doctor:offline", socket.userId);

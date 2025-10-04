@@ -29,14 +29,13 @@ const loginDoc = async (req, res) => {
     if (!doctor) return res.status(401).json({ msg: "invalid Id or password",success:false  });
     
     const ismatch = await bcrypt.compare(password, doctor.password);
-
-    console.log(ismatch);
     
-    // if (!ismatch) return res.status(401).json({ msg: "invalid Id or password",success:false });
+    if (!ismatch) return res.status(401).json({ msg: "invalid Id or password",success:false });
     
-    const token = jwt.sign({ userId: doctor._id }, "xxxyyy", {
+    const token = jwt.sign({ userId: doctor._id,role:"doctor" }, "xxxyyy", {
       expiresIn: "1h",
     });
+
     res.status(200).json({msg:"Login Successfull",success:true,user:doctor.name,token:token})
   } catch (error) {
     return res.status(404).json({ msg: error.message });

@@ -5,6 +5,8 @@ const cors = require("cors");
 const userRoutes = require("./routes/userRoute");
 const docrouter = require("./routes/docRoute");
 const chatbotRoute = require("./routes/chatbotRoute");
+const consulationRoute=require("./routes/consultationRoute")
+
 const {socketAuth}=require("./Sockets/middleware")
 
 const app = express();
@@ -43,6 +45,7 @@ app.use(express.json());
 
 app.use("/api/user", userRoutes);
 app.use("/api/doctor", docrouter);
+app.use("/api/socket",consulationRoute);
 app.use("/api/chatbot", chatbotRoute);
 
 mongoose
