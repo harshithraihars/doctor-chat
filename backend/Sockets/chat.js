@@ -1,28 +1,34 @@
 const jwt = require("jsonwebtoken");
-
+const { onlineDoctors, activeSessions } = require("./onlineUsers");
+const User = require("../models/User");
 let onlineUsers = new Map();
 
 function registerChatHandlers(io, socket) {
-
-  socket.on("joinRoom", ({ roomId }) => {
-    console.log("joined the room with romm id",roomId);
-    
+  socket.on("joinRoom", async ({ roomId, doctorId }, callback) => {
     socket.join(roomId);
-  });
 
-  socket.on("message:send", (data) => {
-    const { toUserId, message } = data;
-    const targetSocketId = onlineUsers.get(toUserId);
+    const client = await User.findById(socket.userId).select("name");
 
-    if (targetSocketId) {
-      io.to(targetSocketId).emit("message:receive", {
-        from: socket.userId,
-        message,
-      });
-    } else {
-      // save in DB for offline delivery
-      console.log("User offline, store message in DB");
+    const existing = activeSessions.get(socket.userId);
+    if (existing && existing !== doctorId) {
+      return callback?.({ success: false, error: "Already in a session" });
     }
+
+    // set active session (both ways)
+    activeSessions.set(socket.userId, doctorId);
+    activeSessions.set(doctorId, socket.userId);
+
+    const doctorSocketId = onlineDoctors.get(doctorId);
+    if (doctorSocketId) {
+      console.log("doctor avilable online", doctorSocketId);
+      io.to(doctorSocketId).emit("clientJoined", {
+        roomId,
+        clientId: socket.userId,
+        clientName: client.name,
+      });
+    }
+
+    callback?.({ success: true, roomId });
   });
 
   socket.on("disconnect", () => {

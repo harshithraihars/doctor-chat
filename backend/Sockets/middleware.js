@@ -10,7 +10,7 @@ function socketAuth(socket, next) {
 
     socket.userId = decoded.userId;
     socket.role = decoded.role;
-    console.log(onlineDoctors);
+    
     
     if (decoded.role === "doctor") onlineDoctors.set(decoded.userId, socket.id);
     else onlinelients.set(decoded.userId, socket.id);    
