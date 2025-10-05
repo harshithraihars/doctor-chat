@@ -1,34 +1,69 @@
+// server file
 const jwt = require("jsonwebtoken");
-const { onlineDoctors, activeSessions } = require("./onlineUsers");
+const {
+  onlineDoctors,
+  activeSessions,
+  onlineClients,
+} = require("./onlineUsers");
 const User = require("../models/User");
+const Doctor=require("../models/Doctor")
 let onlineUsers = new Map();
 
 function registerChatHandlers(io, socket) {
-  socket.on("joinRoom", async ({ roomId, doctorId }, callback) => {
-    socket.join(roomId);
 
-    const client = await User.findById(socket.userId).select("name");
 
-    const existing = activeSessions.get(socket.userId);
-    if (existing && existing !== doctorId) {
-      return callback?.({ success: false, error: "Already in a session" });
+  socket.on("chatRequest", async ({ doctorId, clientId}) => {
+
+    try{
+      const client = await User.findById(socket.userId).select("name");
+      if(!client) return;
+
+      const doctorSocketId = onlineDoctors.get(doctorId);
+      if (doctorSocketId) {
+        io.to(doctorSocketId).emit("chatRequestReceived", {
+          clientId,
+          clientName:client.name,
+        });
+      }
+    }catch(error){
+      socket.emit("error",{msg:error.message|| "someting went wrong"})
     }
+  });
 
-    // set active session (both ways)
-    activeSessions.set(socket.userId, doctorId);
-    activeSessions.set(doctorId, socket.userId);
+  socket.on("chatResponse", async({ clientId,accepted }, callback) => {
+    try{
+      const clientSocketId = onlineClients.get(clientId);
 
-    const doctorSocketId = onlineDoctors.get(doctorId);
-    if (doctorSocketId) {
-      console.log("doctor avilable online", doctorSocketId);
-      io.to(doctorSocketId).emit("clientJoined", {
-        roomId,
-        clientId: socket.userId,
-        clientName: client.name,
-      });
+      if (!clientSocketId) return;
+
+      if (!accepted) {
+        io.to(clientSocketId).emit("chatRejected", { doctorId: socket.userId });
+        return callback?.({ success: true, message: "Rejected" });
+      }
+
+      const roomId = `room-${[clientId, socket.userId].sort().join("-")}`;
+
+      // save active session both ways
+      activeSessions.set(clientId, socket.userId);
+      activeSessions.set(socket.userId, clientId);
+
+      // join both sockets into the room
+      socket.join(roomId);
+      io.sockets.sockets.get(clientSocketId)?.join(roomId);
+
+      const doctor = await Doctor.findById(socket.userId).select("name");
+          
+      const client = await User.findById(clientId).select("name");
+      // notify both sides
+      io.to(clientSocketId).emit("chatAccepted", {roomId,doctorId: socket.userId,role: "client",doctorName:doctor.name});
+
+      // For doctor
+      io.to(socket.id).emit("chatAccepted", {roomId,clientId,role: "doctor",clientName:client.name});
+
+      callback?.({ success: true, roomId });
+    }catch(error){
+      return callback?.({ success: false});
     }
-
-    callback?.({ success: true, roomId });
   });
 
   socket.on("disconnect", () => {

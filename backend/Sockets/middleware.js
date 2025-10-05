@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const {onlinelients,onlineDoctors,activeSessions}=require("./onlineUsers")
+const {onlineClients,onlineDoctors,activeSessions}=require("./onlineUsers")
 function socketAuth(socket, next) {
   try {
     const token = socket.handshake.auth.token;
@@ -13,11 +13,11 @@ function socketAuth(socket, next) {
     
     
     if (decoded.role === "doctor") onlineDoctors.set(decoded.userId, socket.id);
-    else onlinelients.set(decoded.userId, socket.id);    
+    else onlineClients.set(decoded.userId, socket.id);    
     next();
   } catch (err) {
     next(new Error("Authentication error"));
   }
 }
 
-module.exports = { socketAuth, onlinelients };
+module.exports = { socketAuth};

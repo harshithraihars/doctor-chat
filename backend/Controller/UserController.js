@@ -39,7 +39,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign({ userId: user._id,role:"client"}, "xxxyyy", {
       expiresIn: "1h",
     });
-    res.json({ token: token, user: user.name,userId:user._id });
+    res.json({ token: token, name: user.name,userId:user._id });
   } catch (error) {
     res.status(400).json({ message: "Error logging in" });
   }
