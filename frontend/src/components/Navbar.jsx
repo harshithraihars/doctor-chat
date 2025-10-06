@@ -34,7 +34,6 @@ const Navbar = () => {
   const handleLogout = () => {
     dispatch(logout())
     dispatch(removeSocket())
-    toast.success("Logged out successfully");
   };
 
   const handleDoctorLogout = () => {

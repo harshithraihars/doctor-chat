@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
-// import "./Loading.css";
+import "./Loading.css";
+import { useSelector } from "react-redux";
 
 const Loading = () => {
-  const [dots, setDots] = useState("");
 
+  const [dots, setDots] = useState("");
+  const {isLoading,loadingMsg}=useSelector((state)=>state.loading)
   useEffect(() => {
     const interval = setInterval(() => {
       setDots((prev) => (prev.length < 3 ? prev + "." : ""));
     }, 500);
     return () => clearInterval(interval);
-  }, []);
-
+  }, []);  
+  if(!isLoading) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/40">
       <div className="flex flex-col items-center justify-center space-y-6 animate-fade-in">
@@ -34,7 +36,7 @@ const Loading = () => {
         </div>
 
         <p className="text-green-400 text-2xl font-semibold tracking-wide">
-          waiting for the doctors response{dots}
+          {loadingMsg}{dots}
         </p>
       </div>
     </div>

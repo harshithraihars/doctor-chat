@@ -46,7 +46,6 @@ const DoctorRegister = () => {
         }
       );
       const docId = response.data.docId;
-      console.log(docId);
       navigate("/DocLogin");
     } catch (error) {
       console.error("Registration error:", error.message);

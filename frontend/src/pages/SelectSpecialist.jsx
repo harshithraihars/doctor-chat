@@ -52,16 +52,16 @@ const SelectSpecialist = () => {
   };
 
   // show the doctors status wheather he is available or not
-  if (showUnavailable || isFindingDoctor) {
-    return (
-      <DoctorConnectStatus
-        isFindingDoctor={isFindingDoctor}
-        specialistName={specialist}
-        showUnavailable={showUnavailable}
-        onClose={() => setShowUnavailable(false)}
-      />
-    );
-  }
+  // if (showUnavailable || isFindingDoctor) {
+  //   return (
+  //     <DoctorConnectStatus
+  //       isFindingDoctor={isFindingDoctor}
+  //       specialistName={specialist}
+  //       showUnavailable={showUnavailable}
+  //       onClose={() => setShowUnavailable(false)}
+  //     />
+  //   );
+  // }
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#E0FBFC] via-[#C2F0F2] to-[#A0E3F0] py-8 px-4">
@@ -89,12 +89,6 @@ const SelectSpecialist = () => {
                 <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
                 <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8"></div>
 
-                {/* Status Badge */}
-                {/* {availableDoctors?.has(item.name) && (
-                  <div className="absolute top-4 right-4 bg-green-400 text-white text-xs px-2 py-1 rounded-full font-medium">
-                    Available
-                  </div>
-                )} */}
 
                 {/* Specialist Name */}
                 <h2 className="font-bold text-gray-800 text-xl mb-2 text-center z-10 relative">
@@ -109,7 +103,7 @@ const SelectSpecialist = () => {
                 </div>
 
                 {/* Image Container */}
-                <div className="flex justify-center mb-4 flex-grow flex items-center">
+                <div className=" justify-center mb-4 flex-grow flex items-center">
                   <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-white/30 flex items-center justify-center ring-4 ring-white/20">
                     <img
                       src={item.imgsrc}

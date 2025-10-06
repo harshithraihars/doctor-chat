@@ -51,14 +51,13 @@ const Login = () => {
         }
       );
 
-      const { token, user } = response.data;
+      const { token, name, userId } = response.data;
 
-      const auth={ name:user, role: "client" };
+      const auth = { name, role: "client", userId };
 
-      dispatch(loginSuccess({user:auth,token}));
-      
-      navigate("/")
+      dispatch(loginSuccess({ user: auth, token }));
 
+      navigate("/");
     } catch (error) {
       const serverMsg = error.response?.data?.message;
       setError(serverMsg || "Invalid email or password. Please try again.");

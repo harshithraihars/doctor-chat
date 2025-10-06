@@ -34,7 +34,6 @@ const DoctorLogin = () => {
     setError(null);
     setIsLoading(true);
     try {
-      console.log(data.email);
 
       const response = await axios.post(
         "http://localhost:5000/api/doctor/login", // Backend API endpoint
@@ -51,8 +50,6 @@ const DoctorLogin = () => {
       const auth = { name: user, role: "doctor" };
 
       dispatch(loginSuccess({ user: auth, token }));
-
-      toast.success("Logged in Successfully");
       navigate("/");
     } catch (error) {
       console.log(error.message);

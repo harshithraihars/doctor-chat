@@ -3,6 +3,7 @@ import { lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import LazyLoad from "../components/LazyLoad";
 import AvailableDoctorsPage from "../pages/AvailableDoctorsPage";
+import ChatNavigationHandler from "../components/chatNavigationHandler";
 
 const Home = lazy(() => import("../pages/Home"));
 const Login = lazy(() => import("../pages/Login"));
@@ -17,6 +18,7 @@ const ChatBot = lazy(() => import("../pages/ChatBot"));
 export default function AppRoutes() {
   return (
     <Suspense fallback={<LazyLoad />}>
+        <ChatNavigationHandler/>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

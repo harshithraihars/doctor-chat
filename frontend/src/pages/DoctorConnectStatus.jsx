@@ -1,10 +1,18 @@
 import { X, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 const DoctorConnectStatus = ({
   specialistName,
-  onClose,
+  setShowUnavailable,
   isFindingDoctor,
   showUnavailable,
 }) => {
+
+  const navigate = useNavigate("");
+  const onClose = () => {
+    setShowUnavailable(false);
+    navigate("/selectspecialist");
+  };
+  
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       {isFindingDoctor && (
@@ -69,7 +77,7 @@ const DoctorConnectStatus = ({
 
           {/* Title */}
           <h2 className="text-2xl font-bold text-gray-800 text-center mb-4 relative z-10">
-            Doctor Not Available
+            Doctors Not Available
           </h2>
 
           {/* Message */}
@@ -78,8 +86,7 @@ const DoctorConnectStatus = ({
               {specialistName} is currently not available or is Busy
             </p>
             <p className="text-red-600 text-center text-sm mt-1">
-              Please try again later or choose another specialist for immediate
-              consultation.
+              Please try again later for immediate consultation.
             </p>
           </div>
 

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 // import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 
@@ -11,12 +11,13 @@ import { disconnectSocket } from "./redux/socketSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "./redux/appSlice";
+import { registerSocketEvents } from "./Socket/socketEvents";
+import Loading from "./components/LoadingOverlay";
 
 function App() {
   const dispatch = useDispatch();
 
   const { user, token } = useSelector((state) => state.auth); // get from Redux
-
   // On first load, restore auth from localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -32,7 +33,9 @@ function App() {
 
   useEffect(() => {
     if (user && token) {
-      dispatch(initializeSocket(token));
+      const socket=dispatch(initializeSocket(token));
+      
+      registerSocketEvents(socket, dispatch);
     }
 
     return () => {
@@ -48,11 +51,12 @@ function App() {
           <Navbar />
           <main className="flex-grow">
             <AppRoutes />
+            <Loading/>
           </main>
           <Footer />
         </div>
       </Router>
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
 
     // </AuthProvider>

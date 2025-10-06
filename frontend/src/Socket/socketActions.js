@@ -6,8 +6,7 @@ let socketInstance = null;
 
 export const initializeSocket = (token) => (dispatch) => {
   if (!socketInstance) {
-    console.log(socketInstance);
-    
+
     socketInstance = io("http://localhost:5000", { auth: { token } });
 
     socketInstance.on("connect", () =>
@@ -28,3 +27,4 @@ export const removeSocket = () => (dispatch) => {
   }
   return socketInstance;
 };
+
