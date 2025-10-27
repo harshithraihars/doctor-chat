@@ -13,12 +13,9 @@ import {
   Activity,
   Microscope,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import DoctorConnectStatus from "./DoctorConnectStatus";
-import { setActiveChat } from "../redux/appSlice";
-import toast from "react-hot-toast";
-import Loading from "./Loading";
 import { setLoading } from "../redux/loadingSlice";
 
 const AvailableDoctorsPage = () => {
